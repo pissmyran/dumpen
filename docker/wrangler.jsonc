@@ -1,0 +1,16 @@
+// Container config: same Worker, no Cloudflare account, routes or ids.
+// R2 buckets are local files under /data.
+{
+  "name": "dumpen",
+  "main": "src/index.js",
+  "compatibility_date": "2026-10-15",
+  "assets": {
+    "directory": "public",
+    "binding": "ASSETS",
+    "run_worker_first": true
+  },
+  "r2_buckets": [
+    { "binding": "GALLERY_BUCKET", "bucket_name": "gallery" },
+    { "binding": "LEGACY_BUCKET", "bucket_name": "legacy" }
+  ]
+}

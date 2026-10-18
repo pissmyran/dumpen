@@ -1,0 +1,53 @@
+// Återskapad från Cloudflare-API:t 2026-10-16 (deployad version).
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "dumpen",
+  "main": "dist/worker.js",
+  "build": { "command": "node build.mjs" },
+  "compatibility_date": "2026-10-15",
+  "no_bundle": true,
+  "find_additional_modules": false,
+  "workers_dev": false,
+  "preview_urls": false,
+  "routes": [
+    {
+      "pattern": "__PUBLIC_HOST__",
+      "custom_domain": true
+    }
+  ],
+  "observability": {
+    "enabled": true,
+    "redact_query_string": true,
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 1,
+      "invocation_logs": true,
+      "persist": true
+    },
+    "traces": {
+      "enabled": true,
+      "head_sampling_rate": 0.01,
+      "persist": true
+    },
+    "issues": {
+      "enabled": true
+    }
+  },
+  "r2_buckets": [
+    {
+      "binding": "GALLERY_BUCKET",
+      "bucket_name": "__GALLERY_BUCKET__"
+    },
+    {
+      "binding": "LEGACY_BUCKET",
+      "bucket_name": "__LEGACY_BUCKET__"
+    }
+  ],
+  "secrets_store_secrets": [
+    {
+      "binding": "WORKERS_API_TOKEN",
+      "store_id": "__SECRETS_STORE_ID__",
+      "secret_name": "WORKERS_API_TOKEN"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "name": "dumpen-bildarkiv",
+  "version": "1.3.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "check": "node --check src/index.js && node --check public/app.js && node --check public/zip-import.js && node --check public/zip-ui.js && node --check public/r2-ui.js",
+    "dev": "wrangler dev --local",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^4.45.0"
+  }
+}
