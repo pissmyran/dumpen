@@ -2,6 +2,10 @@
 
 Versions follow [semver](https://semver.org). The Docker image is tagged `X.Y.Z`, `X.Y`, `X` and `latest`.
 
+## 1.3.2 – 2026-10-19
+
+- `tools/render.mjs` writes each filled-in file in a loop until every byte is written, so a short write can no longer leave a truncated file behind.
+
 ## 1.3.1 – 2026-10-19
 
 - Image URLs from the API are only used if they are http(s), so a stored value can never become script in the gallery or the move dialog.
