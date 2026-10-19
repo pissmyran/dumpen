@@ -98,6 +98,9 @@ Containern talar vanlig HTTP på port 8787. Med `cloudflare-access` sköter tunn
 
 ## Changelog
 
+**1.3.2**
+- `tools/render.mjs` skriver varje ifylld fil i en loop tills alla byte är skrivna, så att en kort skrivning inte kan lämna en avkortad fil.
+
 **1.3.1**
 - Bildadresser från API:t används bara om de är http(s), så ett lagrat värde kan aldrig bli skript i galleriet.
 - Synken av Access-appar skickar inte längre råa felvärden till webbläsaren.
