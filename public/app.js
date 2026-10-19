@@ -118,13 +118,22 @@ function actionButton(label, className, onClick) {
   button.addEventListener("click", onClick);
   return button;
 }
+// Image URLs come from the API; only http(s) URLs reach an img element.
+function imageUrl(value) {
+  try {
+    const url = new URL(String(value || ""), location.href);
+    return url.protocol === "https:" || url.protocol === "http:" ? url.href : "";
+  } catch {
+    return "";
+  }
+}
 function createCard(item) {
   const card = document.createElement("article");
   card.className = "image-card";
   const visual = document.createElement("div");
   visual.className = "image-visual";
   const img = document.createElement("img");
-  img.src = item.url;
+  img.src = imageUrl(item.url);
   img.alt = `Bild: ${item.app}`;
   img.loading = "lazy";
   visual.append(img);
@@ -294,7 +303,7 @@ export async function moveImage(item, target) {
 }
 function openMove(item) {
   state.moving = item;
-  $("move-image").src = item.url;
+  $("move-image").src = imageUrl(item.url);
   $("move-app").value = item.app;
   $("move-theme").value = item.theme || "";
   $("move-variant").value = item.variant || "";

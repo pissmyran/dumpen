@@ -98,6 +98,11 @@ Containern talar vanlig HTTP på port 8787. Med `cloudflare-access` sköter tunn
 
 ## Changelog
 
+**1.3.1**
+- Bildadresser från API:t används bara om de är http(s), så ett lagrat värde kan aldrig bli skript i galleriet.
+- Synken av Access-appar skickar inte längre råa felvärden till webbläsaren.
+- `tools/render.mjs` läser och skriver varje fil genom samma filbeskrivare, så att filen inte kan bytas ut mellan kontroll och skrivning.
+
 **1.3.0**
 - Inställningar kan ges en gång i `/data/import.env` i stället för i compose-filen. De sparas i `/data/settings.env` och importfilen raderas.
 - Imagen byggs från projektets eget repo: `docker build -t dumpen .`.

@@ -751,7 +751,8 @@ async function themeHandler(request, env, url) {
     }
     return json({ updated, failed });
   } catch (e) {
-    return json({ error: String(e.message || e) }, 502);
+    console.error(e);
+    return json({ error: e instanceof Error ? e.message : "Okänt fel." }, 502);
   }
 }
 
