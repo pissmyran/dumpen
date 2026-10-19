@@ -94,7 +94,7 @@ Alla inställningar beskrivs i [docker/README.md](docker/README.md). Vill du int
 
 ## Bidra
 
-Frågor och idéer tas i [Discussions](https://github.com/VineHarbor/.github/discussions), fel och förslag som issues här. Läs [CONTRIBUTING.md](https://github.com/VineHarbor/.github/blob/main/CONTRIBUTING.md) innan du öppnar en pull request. Säkerhetsproblem rapporteras privat via fliken Security.
+Frågor och idéer tas i [Discussions](https://github.com/VineDrinker/.github/discussions), fel och förslag som issues här. Läs [CONTRIBUTING.md](https://github.com/VineDrinker/.github/blob/main/CONTRIBUTING.md) innan du öppnar en pull request. Säkerhetsproblem rapporteras privat via fliken Security.
 
 ## Licens
 
