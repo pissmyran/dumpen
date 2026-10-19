@@ -2,6 +2,12 @@
 
 Versions follow [semver](https://semver.org). The Docker image is tagged `X.Y.Z`, `X.Y`, `X` and `latest`.
 
+## 1.3.1 – 2026-10-19
+
+- Image URLs from the API are only used if they are http(s), so a stored value can never become script in the gallery or the move dialog.
+- The Access app sync no longer returns raw thrown values; it logs the error and returns only its message.
+- `tools/render.mjs` checks the size of, reads and rewrites each file through one file descriptor, so a file cannot be swapped between the check and the write (CodeQL js/file-system-race).
+
 ## 1.3.0 – 2026-10-18
 
 - Settings can be given once in `/data/import.env` instead of in `docker-compose.yml`: they are saved to `/data/settings.env`, readable only by the container, and the import file is deleted. `NAME=` removes a setting; non-empty compose variables still win.
