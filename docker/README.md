@@ -54,7 +54,7 @@ Välj med `AUTH_MODE`.
 1. **Skapa en tunnel.** Gå till Zero Trust → Networks → Tunnels, skapa en tunnel och peka ett publikt värdnamn mot `http://dumpen:8787`. Kopiera tunnelns token till `TUNNEL_TOKEN`.
 2. **Skapa en Access-applikation.** Gå till Zero Trust → Access → Applications, lägg till en *self-hosted* applikation för samma värdnamn och skapa en policy för vilka som får logga in.
 3. **Fyll i compose-filen.** Kopiera applikationens *Application Audience (AUD) Tag* till `CF_ACCESS_AUD` och teamdomänen (`dittteam.cloudflareaccess.com`) till `CF_ACCESS_TEAM_DOMAIN`. Sätt `AUTH_MODE: "cloudflare-access"` och `PUBLIC_URL` till det publika värdnamnet.
-4. **Lägg till ett undantag för bilderna.** Skapa en Access-applikation för `<värdnamn>/bilder/*` med policyn *Bypass → Everyone*.
+4. **Lägg till ett undantag för bilderna.** Skapa en Access-applikation för `<värdnamn>/bilder/*` med policyn *Bypass → Everyone*. Har zonen *Hotlink Protection* påslaget behövs också en konfigurationsregel som stänger av det för `/bilder/`, annars visas bilderna inte på andra sidor, som App Launcher.
 5. **Starta med tunneln:** `docker compose --profile tunnel up -d`
 
 ## Inställningar
