@@ -4,7 +4,7 @@
 # `wrangler dev --local`; the R2 buckets are files under /data, so keep that
 # directory on a volume. The source has only placeholders; the entrypoint fills
 # them in from the container environment with tools/render.mjs.
-FROM node:22-bookworm-slim
+FROM node:26-bookworm-slim
 
 ENV NODE_ENV=production \
     WRANGLER_SEND_METRICS=false \
