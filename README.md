@@ -47,6 +47,7 @@ Portalen är redan publicerad och skyddad med Access. Ny offentlig bildväg `/bi
 ## Avveckling av föregående bildvärd
 
 1. Skapa en separat självhostad Cloudflare Access-applikation för `<din-host>/bilder/*` och lägg på en **Bypass → Everyone**-policy. Ändra **inte** den befintliga Dumpen-portalens `Allow`-policy.
+   Är *Hotlink Protection* (Scrape Shield) påslaget för zonen: lägg till en konfigurationsregel (Rules → Configuration Rules) för `http.host eq "<din-host>" and starts_with(http.request.uri.path, "/bilder/")` med *Hotlink Protection: Off*. Annars nekas bilderna med 403 (felkod 1011) när en annan sida, till exempel Cloudflare App Launcher, visar dem.
 2. Driftsätt den uppdaterade Worker-koden och verifiera anonym `GET` för en befintlig bild under `/bilder/apps/…`, samt 403/Access-inloggning för `/` och `/api/images`.
 3. Byt de 12 identifierade App Launcher-bildlänkarna från den gamla värden till `https://<din-host>/bilder/<samma-R2-objektnyckel>`. Kontrollera att varje bild visas.
 4. Koppla därefter bort tidigare R2 Custom Domain i `<legacy-bucket>`; den medföljande automatiskt hanterade DNS-posten tas normalt bort samtidigt. Rensa slutligen cache-/konfigurationsregler som enbart avser den gamla bildvärden. Ta inte bort R2-bucketen eller bildobjekt.
