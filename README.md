@@ -1,5 +1,7 @@
 # Dumpen — privat bildarkiv
 
+**Dokumentation:** [vinedrinker.github.io/dumpen](https://vinedrinker.github.io/dumpen/) – start, dokumentation och Docker på en sida med sök.
+
 Fristående svenskt gränssnitt för applikationsikoner och temabilder. Inga befintliga objekt skrivs om. Applikationen använder **en Worker med statiska assets**, en befintlig R2-bucket och Cloudflare Access. Ingen D1, KV eller Queue.
 
 ## Funktioner
