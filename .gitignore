@@ -16,5 +16,3 @@ skills-lock.json
 # Documentation site (tools/docs-site.mjs, zensical build)
 site-docs/
 site/
-site-cf/
-.venv-docs/
