@@ -92,7 +92,7 @@ Containern talar vanlig HTTP på port 8787. Med `cloudflare-access` sköter tunn
 - **Lösenordsläget:** sessionen är en cookie (`HttpOnly`, `SameSite=Strict`) med utgångstid och en HMAC-SHA256-signatur, där `ADMIN_PASSWORD` är nyckeln. Lösenord och signatur jämförs i konstant tid, och fel lösenord ger en fördröjning. Ingen sessionsdata sparas på servern.
 - **Access-läget:** RS256-signaturen kontrolleras mot teamets publika nycklar, liksom utfärdare, AUD och giltighetstid.
 - **Ändringar:** alla ändrande anrop kräver same-origin. Svaren har strikt CSP och övriga säkerhetshuvuden. Bilder serveras bara med `GET` och `HEAD`, och bara för tillåtna sökvägar och filtyper.
-- **Imagen** bygger på `node:22-bookworm-slim`, kör som användaren `node` och har en healthcheck. Den byggs i två steg, så att bara den neutraliserade källkoden hamnar i det färdiga lagret.
+- **Imagen** bygger på `node:24-trixie-slim` (Node LTS på Debian stable), kör som användaren `node` och har en healthcheck. Den byggs i två steg, så att bara den neutraliserade källkoden hamnar i det färdiga lagret.
 - **Begränsningar:** `wrangler dev` är en utvecklingsserver som kör en process på en maskin. Det räcker för ett privat bildarkiv men ger inte Cloudflares skalning eller CDN. Bilderna cachas bara med vanliga `Cache-Control`-huvuden.
 - **Felsökning:** `docker compose logs -f`.
 
