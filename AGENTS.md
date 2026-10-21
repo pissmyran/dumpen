@@ -1,6 +1,6 @@
 # AGENTS.md
 
-- Gemensamma regler för arbetssätt, deploy, loggning, kostnader och Docker finns i [CLAUDE.md](CLAUDE.md). Allt arbete sker på `dev`; `main` ändras bara genom en PR från `dev` med merge commit.
+- Gemensamma regler för arbetssätt, deploy, loggning, kostnader och Docker finns i [CLAUDE.md](CLAUDE.md). Allt arbete sker på `dev`; `main` ändras bara genom en PR från `dev` med squash merge.
 - Läs [README.md](README.md) före större ändringar.
 - `src/index.js` är skriven för Workers Static Assets. Det som deployas är `dist/worker.js`, som `build.mjs` bygger med `public/` inbäddat och produktionens variabler injicerade. Ändra källan, inte `dist/`.
 - Bara `/bilder/*` är publikt. Allt annat kräver inloggning: Cloudflare Access-JWT i produktion, eller `AUTH_MODE=password` i en egen installation. Sätt aldrig `AUTH_MODE` eller `LOCAL_DEV` i produktion.
