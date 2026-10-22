@@ -66,7 +66,7 @@ Välj med `AUTH_MODE`.
 | `ADMIN_PASSWORD` | Med `password` | – | Minst 8 tecken, gärna betydligt längre. |
 | `CF_ACCESS_TEAM_DOMAIN` | Med `cloudflare-access` | – | T.ex. `dittteam.cloudflareaccess.com`. |
 | `CF_ACCESS_AUD` | Med `cloudflare-access` | – | Access-applikationens AUD-tagg. |
-| `CLOUDFLARE_API_TOKEN` | Nej | – | Bara för funktionen "Använd i App Launcher", som sätter ett temas ikoner på dina Cloudflare Access-appar. Behörighet: *Access: Apps and Policies: Edit*. |
+| `CLOUDFLARE_API_TOKEN` | Nej | – | Bara för funktionen "Använd i App Launcher", som sätter ett temas ikoner på dina Cloudflare Access-appar. Behörighet: bara *Access: Apps Write* (i äldre listor *Access: Apps and Policies: Edit*). Använd inte ett token med deploy-behörigheter. |
 | `CLOUDFLARE_ACCOUNT_ID` | Nej | – | Ditt Cloudflare-konto-id, för samma funktion. |
 | `TUNNEL_TOKEN` (tjänsten `tunnel`) | Nej | – | Token för Cloudflare Tunnel. |
 | `PORT` | Nej | `8787` | Porten inne i containern. |
