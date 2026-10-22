@@ -4,6 +4,14 @@
 const textEncoder = new TextEncoder();
 const pngHeader = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]);
 const MAX_UPLOAD = 12 * 1024 * 1024;
+const IMAGE_TYPES = {
+  png: "image/png",
+  webp: "image/webp",
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  gif: "image/gif",
+  avif: "image/avif",
+};
 const PAGE_LIMIT = 500;
 let certCache = { url: "", expires: 0, keys: [] };
 
@@ -122,7 +130,8 @@ async function accessAuthorized(request, env) {
     return true;
   const aud = String(env.CF_ACCESS_AUD || "");
   const team = String(env.CF_ACCESS_TEAM_DOMAIN || "");
-  if (!aud || aud.startsWith("REPLACE_") || !/^[a-z0-9-]+\.cloudflareaccess\.com$/.test(team))
+  // An unrendered __NAME__ placeholder is never a valid value.
+  if (!aud || /^__.*__$/.test(aud) || !/^[a-z0-9-]+\.cloudflareaccess\.com$/.test(team))
     return false;
   const token = request.headers.get("cf-access-jwt-assertion");
   if (!token) return false;
@@ -464,17 +473,9 @@ async function r2Api(request, env, url) {
       if (!obj) return new Response("Filen finns inte.", { status: 404 });
       if (obj.size > MAX_LEGACY_BYTES) return new Response("Filen är för stor.", { status: 413 });
       const ext = key.split(".").at(-1).toLowerCase();
-      const types = {
-        png: "image/png",
-        webp: "image/webp",
-        jpg: "image/jpeg",
-        jpeg: "image/jpeg",
-        gif: "image/gif",
-        avif: "image/avif",
-      };
       return new Response(obj.body, {
         headers: {
-          "content-type": types[ext],
+          "content-type": IMAGE_TYPES[ext],
           "cache-control": "private, no-store",
           "x-content-type-options": "nosniff",
           "content-security-policy": "default-src 'none'",
@@ -545,7 +546,8 @@ function sameOriginRequest(request) {
   return !!origin && origin === new URL(request.url).origin;
 }
 
-/* Dumpen App Launcher tema v1 */
+// "Använd i App Launcher": sets a theme's icons as the logos of the Cloudflare
+// Access apps, through the API with WORKERS_API_TOKEN (Access: Apps Write).
 async function themeCF(env, method, path, body) {
   const token =
       typeof env.WORKERS_API_TOKEN === "string"
@@ -908,7 +910,7 @@ async function handleApi(request, env, url) {
   return json({ error: "Sidan finns inte." }, 404);
 }
 
-// Only these three R2 namespaces are readable without signing in.
+// Only these three R2 prefixes are readable without signing in.
 // The private /api/* and portal routes never pass through this public handler.
 async function servePublicImage(request, env, url) {
   if (!["GET", "HEAD"].includes(request.method))
@@ -931,14 +933,6 @@ async function servePublicImage(request, env, url) {
   )
     return new Response("Sidan finns inte.", { status: 404 });
   const ext = key.slice(key.lastIndexOf(".") + 1).toLowerCase();
-  const types = {
-    png: "image/png",
-    webp: "image/webp",
-    jpg: "image/jpeg",
-    jpeg: "image/jpeg",
-    gif: "image/gif",
-    avif: "image/avif",
-  };
   const selectedBucket = key.startsWith("gallery/") ? env.GALLERY_BUCKET : env.LEGACY_BUCKET;
   if (!selectedBucket) return new Response("Bildlagringen är inte tillgänglig.", { status: 503 });
   try {
@@ -951,7 +945,7 @@ async function servePublicImage(request, env, url) {
     return new Response(request.method === "HEAD" ? null : object.body, {
       status: 200,
       headers: {
-        "content-type": types[ext],
+        "content-type": IMAGE_TYPES[ext],
         "content-length": String(object.size),
         "cache-control": "public, max-age=86400",
         "x-content-type-options": "nosniff",

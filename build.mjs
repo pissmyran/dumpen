@@ -1,5 +1,5 @@
-// Builds the self-contained worker deployed to Cloudflare (port of the original build-single-worker.py):
-// embeds public/ as JSON, serves it via an in-memory ASSETS shim, and injects the production vars.
+// Builds the self-contained Worker that is deployed to Cloudflare: embeds public/
+// as JSON, serves it through an in-memory ASSETS shim and injects the production vars.
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 
 // __NAME__ placeholders are filled in by tools/render.mjs before deploy.

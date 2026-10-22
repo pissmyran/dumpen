@@ -92,7 +92,7 @@ Containern talar vanlig HTTP på port 8787. Med `cloudflare-access` sköter tunn
 - **Lösenordsläget:** sessionen är en cookie (`HttpOnly`, `SameSite=Strict`) med utgångstid och en HMAC-SHA256-signatur, där `ADMIN_PASSWORD` är nyckeln. Lösenord och signatur jämförs i konstant tid, och fel lösenord ger en fördröjning. Ingen sessionsdata sparas på servern.
 - **Access-läget:** RS256-signaturen kontrolleras mot teamets publika nycklar, liksom utfärdare, AUD och giltighetstid.
 - **Ändringar:** alla ändrande anrop kräver same-origin. Svaren har strikt CSP och övriga säkerhetshuvuden. Bilder serveras bara med `GET` och `HEAD`, och bara för tillåtna sökvägar och filtyper.
-- **Imagen** bygger på `node:24-trixie-slim` (Node LTS på Debian stable), kör som användaren `node` och har en healthcheck. Den byggs i två steg, så att bara den neutraliserade källkoden hamnar i det färdiga lagret.
+- **Imagen** bygger på `node:24-trixie-slim` (Node LTS på Debian stable), kör som användaren `node` och har en healthcheck. Den innehåller bara källkod med platshållare; dina värden fylls i när containern startar.
 - **Begränsningar:** `wrangler dev` är en utvecklingsserver som kör en process på en maskin. Det räcker för ett privat bildarkiv men ger inte Cloudflares skalning eller CDN. Bilderna cachas bara med vanliga `Cache-Control`-huvuden.
 - **Felsökning:** `docker compose logs -f`.
 
@@ -100,6 +100,9 @@ Containern talar vanlig HTTP på port 8787. Med `cloudflare-access` sköter tunn
 
 **2.0.0**
 - Token för "Använd i App Launcher" heter nu `WORKERS_API_TOKEN`, samma namn som på Cloudflare. Byt namn på `CLOUDFLARE_API_TOKEN` i din compose-fil eller `import.env`; det gamla namnet läses inte längre.
+
+**1.3.3**
+- Imagen bygger på `node:24-trixie-slim`: Node 24 (LTS) på Debian 13 (stable).
 
 **1.3.2**
 - `tools/render.mjs` skriver varje ifylld fil i en loop tills alla byte är skrivna, så att en kort skrivning inte kan lämna en avkortad fil.
@@ -123,4 +126,4 @@ Containern talar vanlig HTTP på port 8787. Med `cloudflare-access` sköter tunn
 
 ## Licens
 
-Dumpen har ingen angiven licens. Den medföljande komponenten `pako` har MIT-licens.
+MIT. Den medföljande komponenten `pako` har också MIT-licens.

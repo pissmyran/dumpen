@@ -128,7 +128,8 @@ test("All production requests are denied unless Access JWT is configured and ver
   const response = await worker.fetch(req("/"), e);
   assert.equal(response.status, 403);
   assert.equal((await worker.fetch(req("/api/images"), e)).status, 403);
-  e.CF_ACCESS_AUD = "REPLACE_WITH_NEW_DUMPEN_ACCESS_AUD";
+  e.CF_ACCESS_AUD = "__CF_ACCESS_AUD__";
+  e.CF_ACCESS_TEAM_DOMAIN = "team.cloudflareaccess.com";
   assert.equal(
     (
       await worker.fetch(
