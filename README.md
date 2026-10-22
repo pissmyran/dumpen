@@ -89,24 +89,6 @@ Koden innehåller inga kontouppgifter. Där ett eget värde behövs, som domän,
 
 **Alternativ 2: Workers Builds med GitHub-koppling.** Lägg in värdena som *build variables* i Cloudflare (Workers → din Worker → Settings → Build), sätt byggkommandot till `node tools/render.mjs - build` och deploykommandot till `npx wrangler deploy --cwd build`. Bygg bara produktionsgrenen (stäng av bygg för andra grenar), så skapas inga förhandsversioner. Hemligheter läggs in som i alternativ 1.
 
-### API-tokens och behörigheter
-
-Ge varje token bara det som står här, och sätt ett slutdatum (till exempel ett år) så att det roteras. Namnen är behörigheterna som de heter när du skapar ett eget token i Cloudflare.
-
-- **Deploy-token** (för `wrangler deploy` från din egen dator; används inte av Workern):
-  - *Workers Editor* (kontot)
-  - *Workers R2 Storage Write* (kontot): bucketarna för galleriet och den äldre bildvärden
-  - *Secrets Store Edit* (kontot): binder `WORKERS_API_TOKEN` från Secrets Store
-  - *Account Settings Read* (kontot)
-  - *Workers Routes Write* (bara din zon): den egna domänen
-  - *Zone Read* (bara din zon)
-  - Valfritt för felsökning: *Workers Observability Read* och *Workers Tail Read* (kontot)
-- **Workers Builds** (alternativ 2): Cloudflare skapar och använder ett eget byggtoken. Kontrollera under Settings → Build att det har samma behörigheter som deploy-tokenet ovan, särskilt *Secrets Store Edit*.
-- **`WORKERS_API_TOKEN`** (lagras i Secrets Store och läses av Workern vid körning, bara för funktionen "Använd i App Launcher"):
-  - *Access: Apps Write* (kontot; i äldre listor *Access: Apps and Policies: Edit*)
-  - Inget annat. Konto-id:t kommer från `CLOUDFLARE_ACCOUNT_ID`, så *Account Settings Read* behövs inte. Ge det aldrig deploy-behörigheter: den som kommer åt Workerns hemligheter ska inte kunna deploya kod.
-- **`CLOUDFLARE_API_TOKEN` i Docker**: samma token och samma enda behörighet som `WORKERS_API_TOKEN`. Använd inte ett deploy-token här.
-
 ## Köra med Docker
 
 Dumpen finns som generisk image, `docker.io/driftaegis/dumpen`. Ladda ner `docker-compose.yml`, fyll i `PUBLIC_URL` och välj inloggning med `AUTH_MODE`: `password` (fyll i `ADMIN_PASSWORD`) eller `cloudflare-access` (Access framför sidan, gärna via den medföljande Cloudflare Tunnel-tjänsten). Kör sedan `docker compose up -d`. Bilderna sparas i volymen under `/data`. Ändringar listas i `CHANGELOG.md`.
