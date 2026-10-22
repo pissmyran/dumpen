@@ -547,7 +547,7 @@ function sameOriginRequest(request) {
 }
 
 // "Använd i App Launcher": sets a theme's icons as the logos of the Cloudflare
-// Access apps, through the API with WORKERS_API_TOKEN (Access: Apps Write).
+// Access apps, through the API with WORKERS_API_TOKEN (Access: Apps: Edit).
 async function themeCF(env, method, path, body) {
   const token =
       typeof env.WORKERS_API_TOKEN === "string"
