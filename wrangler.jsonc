@@ -1,4 +1,3 @@
-// Återskapad från Cloudflare-API:t 2026-10-16 (deployad version).
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "dumpen",

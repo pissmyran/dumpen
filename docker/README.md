@@ -6,6 +6,8 @@ Alla bilder är publika via sin länk, `/bilder/...`. Allt annat, alltså galler
 
 ## Kom igång
 
+Imagen ligger på Docker Hub som `docker.io/driftaegis/dumpen`. Compose-filen nedan hämtar den därifrån, så du behöver varken klona repot eller bygga något.
+
 1. **Installera Docker.** På Windows och Mac: [Docker Desktop](https://www.docker.com/products/docker-desktop/). På Linux: paketet `docker.io` (Debian/Ubuntu) eller motsvarande. Podman fungerar också.
 2. **Skapa en mapp** och en fil i den som heter `docker-compose.yml`. Klistra in innehållet nedan.
 3. **Fyll i** `PUBLIC_URL` (adressen du öppnar Dumpen på) och ett eget `ADMIN_PASSWORD` på minst 8 tecken.
@@ -15,7 +17,7 @@ Alla bilder är publika via sin länk, `/bilder/...`. Allt annat, alltså galler
 ```yaml
 services:
   dumpen:
-    image: docker.io/driftaegis/dumpen:1
+    image: docker.io/driftaegis/dumpen:2
     restart: unless-stopped
     ports:
       - "8787:8787"
@@ -25,7 +27,7 @@ services:
       ADMIN_PASSWORD: "change-me-to-a-long-password"
       CF_ACCESS_TEAM_DOMAIN: ""
       CF_ACCESS_AUD: ""
-      CLOUDFLARE_API_TOKEN: ""
+      WORKERS_API_TOKEN: ""
       CLOUDFLARE_ACCOUNT_ID: ""
     volumes:
       - dumpen-data:/data
@@ -66,7 +68,7 @@ Välj med `AUTH_MODE`.
 | `ADMIN_PASSWORD` | Med `password` | – | Minst 8 tecken, gärna betydligt längre. |
 | `CF_ACCESS_TEAM_DOMAIN` | Med `cloudflare-access` | – | T.ex. `dittteam.cloudflareaccess.com`. |
 | `CF_ACCESS_AUD` | Med `cloudflare-access` | – | Access-applikationens AUD-tagg. |
-| `CLOUDFLARE_API_TOKEN` | Nej | – | Bara för funktionen "Använd i App Launcher", som sätter ett temas ikoner på dina Cloudflare Access-appar. Behörighet: *Access: Apps and Policies: Edit*. |
+| `WORKERS_API_TOKEN` | Nej | – | Bara för funktionen "Använd i App Launcher", som sätter ett temas ikoner på dina Cloudflare Access-appar. Behörighet: *Access: Apps: Edit*. |
 | `CLOUDFLARE_ACCOUNT_ID` | Nej | – | Ditt Cloudflare-konto-id, för samma funktion. |
 | `TUNNEL_TOKEN` (tjänsten `tunnel`) | Nej | – | Token för Cloudflare Tunnel. |
 | `PORT` | Nej | `8787` | Porten inne i containern. |
@@ -92,11 +94,17 @@ Containern talar vanlig HTTP på port 8787. Med `cloudflare-access` sköter tunn
 - **Lösenordsläget:** sessionen är en cookie (`HttpOnly`, `SameSite=Strict`) med utgångstid och en HMAC-SHA256-signatur, där `ADMIN_PASSWORD` är nyckeln. Lösenord och signatur jämförs i konstant tid, och fel lösenord ger en fördröjning. Ingen sessionsdata sparas på servern.
 - **Access-läget:** RS256-signaturen kontrolleras mot teamets publika nycklar, liksom utfärdare, AUD och giltighetstid.
 - **Ändringar:** alla ändrande anrop kräver same-origin. Svaren har strikt CSP och övriga säkerhetshuvuden. Bilder serveras bara med `GET` och `HEAD`, och bara för tillåtna sökvägar och filtyper.
-- **Imagen** bygger på `node:24-trixie-slim` (Node LTS på Debian stable), kör som användaren `node` och har en healthcheck. Den byggs i två steg, så att bara den neutraliserade källkoden hamnar i det färdiga lagret.
+- **Imagen** bygger på `node:24-trixie-slim` (Node LTS på Debian stable), kör som användaren `node` och har en healthcheck. Den innehåller bara källkod med platshållare; dina värden fylls i när containern startar.
 - **Begränsningar:** `wrangler dev` är en utvecklingsserver som kör en process på en maskin. Det räcker för ett privat bildarkiv men ger inte Cloudflares skalning eller CDN. Bilderna cachas bara med vanliga `Cache-Control`-huvuden.
 - **Felsökning:** `docker compose logs -f`.
 
 ## Changelog
+
+**2.0.0**
+- Token för "Använd i App Launcher" heter nu `WORKERS_API_TOKEN`, samma namn som på Cloudflare. Byt namn på `CLOUDFLARE_API_TOKEN` i din compose-fil eller `import.env`; det gamla namnet läses inte längre. Byt också taggen till `:2` i compose-filen, eftersom `:1` stannar på version 1.
+
+**1.3.3**
+- Imagen bygger på `node:24-trixie-slim`: Node 24 (LTS) på Debian 13 (stable).
 
 **1.3.2**
 - `tools/render.mjs` skriver varje ifylld fil i en loop tills alla byte är skrivna, så att en kort skrivning inte kan lämna en avkortad fil.
@@ -120,4 +128,4 @@ Containern talar vanlig HTTP på port 8787. Med `cloudflare-access` sköter tunn
 
 ## Licens
 
-Dumpen har ingen angiven licens. Den medföljande komponenten `pako` har MIT-licens.
+MIT. Den medföljande komponenten `pako` har också MIT-licens.
