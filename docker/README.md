@@ -25,7 +25,7 @@ services:
       ADMIN_PASSWORD: "change-me-to-a-long-password"
       CF_ACCESS_TEAM_DOMAIN: ""
       CF_ACCESS_AUD: ""
-      CLOUDFLARE_API_TOKEN: ""
+      WORKERS_API_TOKEN: ""
       CLOUDFLARE_ACCOUNT_ID: ""
     volumes:
       - dumpen-data:/data
@@ -66,7 +66,7 @@ Välj med `AUTH_MODE`.
 | `ADMIN_PASSWORD` | Med `password` | – | Minst 8 tecken, gärna betydligt längre. |
 | `CF_ACCESS_TEAM_DOMAIN` | Med `cloudflare-access` | – | T.ex. `dittteam.cloudflareaccess.com`. |
 | `CF_ACCESS_AUD` | Med `cloudflare-access` | – | Access-applikationens AUD-tagg. |
-| `CLOUDFLARE_API_TOKEN` | Nej | – | Bara för funktionen "Använd i App Launcher", som sätter ett temas ikoner på dina Cloudflare Access-appar. Behörighet: *Access: Apps and Policies: Edit*. |
+| `WORKERS_API_TOKEN` | Nej | – | Bara för funktionen "Använd i App Launcher", som sätter ett temas ikoner på dina Cloudflare Access-appar. Behörighet: *Access: Apps and Policies: Edit*. |
 | `CLOUDFLARE_ACCOUNT_ID` | Nej | – | Ditt Cloudflare-konto-id, för samma funktion. |
 | `TUNNEL_TOKEN` (tjänsten `tunnel`) | Nej | – | Token för Cloudflare Tunnel. |
 | `PORT` | Nej | `8787` | Porten inne i containern. |
@@ -97,6 +97,9 @@ Containern talar vanlig HTTP på port 8787. Med `cloudflare-access` sköter tunn
 - **Felsökning:** `docker compose logs -f`.
 
 ## Changelog
+
+**2.0.0**
+- Token för "Använd i App Launcher" heter nu `WORKERS_API_TOKEN`, samma namn som på Cloudflare. Byt namn på `CLOUDFLARE_API_TOKEN` i din compose-fil eller `import.env`; det gamla namnet läses inte längre.
 
 **1.3.2**
 - `tools/render.mjs` skriver varje ifylld fil i en loop tills alla byte är skrivna, så att en kort skrivning inte kan lämna en avkortad fil.
