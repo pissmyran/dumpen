@@ -6,6 +6,8 @@ Alla bilder är publika via sin länk, `/bilder/...`. Allt annat, alltså galler
 
 ## Kom igång
 
+Imagen ligger på Docker Hub som `docker.io/driftaegis/dumpen`. Compose-filen nedan hämtar den därifrån, så du behöver varken klona repot eller bygga något.
+
 1. **Installera Docker.** På Windows och Mac: [Docker Desktop](https://www.docker.com/products/docker-desktop/). På Linux: paketet `docker.io` (Debian/Ubuntu) eller motsvarande. Podman fungerar också.
 2. **Skapa en mapp** och en fil i den som heter `docker-compose.yml`. Klistra in innehållet nedan.
 3. **Fyll i** `PUBLIC_URL` (adressen du öppnar Dumpen på) och ett eget `ADMIN_PASSWORD` på minst 8 tecken.
@@ -15,7 +17,7 @@ Alla bilder är publika via sin länk, `/bilder/...`. Allt annat, alltså galler
 ```yaml
 services:
   dumpen:
-    image: docker.io/driftaegis/dumpen:1
+    image: docker.io/driftaegis/dumpen:2
     restart: unless-stopped
     ports:
       - "8787:8787"
@@ -99,7 +101,7 @@ Containern talar vanlig HTTP på port 8787. Med `cloudflare-access` sköter tunn
 ## Changelog
 
 **2.0.0**
-- Token för "Använd i App Launcher" heter nu `WORKERS_API_TOKEN`, samma namn som på Cloudflare. Byt namn på `CLOUDFLARE_API_TOKEN` i din compose-fil eller `import.env`; det gamla namnet läses inte längre.
+- Token för "Använd i App Launcher" heter nu `WORKERS_API_TOKEN`, samma namn som på Cloudflare. Byt namn på `CLOUDFLARE_API_TOKEN` i din compose-fil eller `import.env`; det gamla namnet läses inte längre. Byt också taggen till `:2` i compose-filen, eftersom `:1` stannar på version 1.
 
 **1.3.3**
 - Imagen bygger på `node:24-trixie-slim`: Node 24 (LTS) på Debian 13 (stable).

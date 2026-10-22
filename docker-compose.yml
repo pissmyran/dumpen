@@ -15,7 +15,7 @@
 #                        4. Start with the tunnel: docker compose --profile tunnel up -d
 services:
   dumpen:
-    image: docker.io/driftaegis/dumpen:1
+    image: docker.io/driftaegis/dumpen:2
     restart: unless-stopped
     ports:
       - "8787:8787"

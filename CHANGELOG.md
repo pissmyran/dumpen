@@ -4,7 +4,7 @@ Versions follow [semver](https://semver.org). The Docker image is tagged `X.Y.Z`
 
 ## 2.0.0 – 2026-10-22
 
-- Breaking: the Docker setting for the App Launcher theme token is now `WORKERS_API_TOKEN`, the same name as on Cloudflare. Rename `CLOUDFLARE_API_TOKEN` in `docker-compose.yml` or `import.env`; the old name is no longer read.
+- Breaking: the Docker setting for the App Launcher theme token is now `WORKERS_API_TOKEN`, the same name as on Cloudflare. Rename `CLOUDFLARE_API_TOKEN` in `docker-compose.yml` or `import.env`; the old name is no longer read. Change the image tag to `:2`; `:1` stays on version 1.
 
 ## 1.3.3 – 2026-10-21
 
