@@ -15,7 +15,7 @@
 #                        4. Start with the tunnel: docker compose --profile tunnel up -d
 services:
   dumpen:
-    image: docker.io/driftaegis/dumpen:2
+    image: docker.io/driftaegis/dumpen:2@sha256:64e31045a82357df194b863b5577407c42f1b66abbdb72a29867cc2b907ad760
     restart: unless-stopped
     ports:
       - "8787:8787"
@@ -36,7 +36,7 @@ services:
       - dumpen-data:/data # the images (local R2)
 
   tunnel:
-    image: docker.io/cloudflare/cloudflared:latest
+    image: docker.io/cloudflare/cloudflared:latest@sha256:faa8e0a1475f137c910be6025f43c8e4092fdd35461b31e19fd1390657a1ff39
     profiles: ["tunnel"]
     restart: unless-stopped
     command: tunnel --no-autoupdate run
