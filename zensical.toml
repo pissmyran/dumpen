@@ -6,14 +6,14 @@
 [project]
 site_name = "Dumpen"
 site_description = "Bildarkiv för appikoner och teman på Cloudflare R2, med ZIP-import och temabibliotek."
-repo_url = "https://github.com/VineDrinker/dumpen"
-repo_name = "VineDrinker/dumpen"
+repo_url = "https://github.com/pissmyran/dumpen"
+repo_name = "pissmyran/dumpen"
 docs_dir = "site-docs"
 site_dir = "site"
 nav = [
   { "Start" = "index.md" },
   { "Docker" = "docker.md" },
-  { "Källkod på GitHub" = "https://github.com/VineDrinker/dumpen#readme" },
+  { "Källkod på GitHub" = "https://github.com/pissmyran/dumpen#readme" },
 ]
 
 [project.theme]
@@ -60,7 +60,7 @@ toggle.name = "Följ systemets inställning"
 
 [[project.extra.social]]
 icon = "fontawesome/brands/github"
-link = "https://github.com/VineDrinker/dumpen#readme"
+link = "https://github.com/pissmyran/dumpen#readme"
 name = "Källkoden på GitHub"
 
 [project.markdown_extensions]
