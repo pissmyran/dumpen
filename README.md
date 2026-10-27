@@ -1,6 +1,6 @@
 # Dumpen
 
-**Dokumentation:** [vinedrinker.github.io/dumpen](https://vinedrinker.github.io/dumpen/) – start, dokumentation och Docker på en sida med sök.
+**Dokumentation:** [pissmyran.github.io/dumpen](https://pissmyran.github.io/dumpen/) – start, dokumentation och Docker på en sida med sök.
 
 Dumpen är ett privat bildarkiv för appikoner och temabilder. Det körs som en Cloudflare Worker med bilderna i R2 och inloggning via Cloudflare Access. Det behöver ingen databas, KV eller kö.
 
@@ -84,7 +84,7 @@ Taggen `2` ger alla uppdateringar inom version 2; `X.Y` ger bara rättningar och
 
 ## Bidra
 
-Frågor och idéer tas i [Discussions](https://github.com/VineDrinker/.github/discussions), fel och förslag som issues här. Läs [CONTRIBUTING.md](https://github.com/VineDrinker/.github/blob/main/CONTRIBUTING.md) innan du öppnar en pull request. Säkerhetsproblem rapporteras privat via fliken Security.
+Frågor och idéer tas i [Discussions](https://github.com/pissmyran/.github/discussions), fel och förslag som issues här. Läs [CONTRIBUTING.md](https://github.com/pissmyran/.github/blob/main/CONTRIBUTING.md) innan du öppnar en pull request. Säkerhetsproblem rapporteras privat via fliken Security.
 
 ## Licens
 
