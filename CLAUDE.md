@@ -13,7 +13,7 @@ De gemensamma reglerna för alla repon finns i [STYRNING.md](https://github.com/
 4. **Testa lokalt före varje push.** Det finns inga testkontroller i CI. Repots egna tester och kontroller (avsnittet Kommandon i repots `CLAUDE.md`) är den enda testgrinden. Pusha aldrig med fallerande tester, och skriv tester för det du ändrar.
 5. **Rör aldrig workflows.** `.github/workflows/`, `.github/actions/` och `CODEOWNERS` ändras inte av Claude, inte ens för att laga ett fel. Ingen kontroll stoppar det längre, men regeln gäller fullt ut. Behövs en ändring: beskriv den i ett issue och låt ägaren göra den. Bara Renovate och Dependabot får uppdatera dem.
 6. **Granskning.** CodeRabbit, Sourcery och Codex granskar, och CodeQL (GitHubs standardinställning) skannar. Varje granskningstråd måste lösas innan merge. Svara i tråden med vad du ändrade, eller med skälet om fyndet är brus.
-7. **Auto-merge sist.** Slå på auto-merge först när granskningsbotarna har granskat den senaste commiten, alla trådar är lösta och alla kontroller som körs på PR:en är gröna, även de som reglerna inte kräver (till exempel `Dokumentation`).
+7. **Auto-merge sist.** Slå på auto-merge först när granskningsbotarna har granskat den senaste commiten (CodeRabbit hoppar över `docs/` och `*.md`; för sådana ändringar räcker Sourcery och Codex), alla trådar är lösta och alla kontroller som körs på PR:en är gröna, även de som reglerna inte kräver (till exempel `Dokumentation`).
 8. **Laga orsaken, inte symptomet.** När något fallerar eller en granskning kräver ändring: läs allt, hitta orsaken och gör om den delen rätt. Små uppenbara fel får rättas direkt. Försvaga aldrig ett test, hoppa aldrig över en kontroll och tysta aldrig en varning.
 9. **Säkerhet först.** Säkerhetslarm (CodeQL, Dependabot, Renovate) går före annat arbete. Länka issuet med `Closes #n`.
 10. **Senaste versionerna.** Lägg aldrig till nya låsningar till ett versionsnummer; använd `@latest`, `node`, `latest` och versionsintervall. Befintliga låsningar som Renovate håller aktuella (till exempel `packageManager`, `requirements-docs.txt`, `.node-version`, lockfiler och actions låsta med commit-SHA) behålls och ändras bara av Renovate.
@@ -76,7 +76,7 @@ Kör också, för det du har ändrat: `npx --yes prettier@latest --check .` (ins
 - **Körning:** Workern körs i workerd via `wrangler dev --local` med allt tillstånd under `/data`. Entrypointen renderar källan med `tools/render.mjs` från containerns miljö med standardvärden som fungerar direkt, och genererar saknade krypteringsnycklar en gång till `/data`. Befintliga nycklar skrivs aldrig över. Bilderna startar tomma och läser aldrig från någons Cloudflare-resurser.
 - **Inställningar** kommer från `docker-compose.yml`, eller en gång från `/data/import.env`, som `import-settings.sh` slår ihop med `/data/settings.env` och sedan raderar. Icke-tomma compose-variabler vinner.
 - **Håll ihop:** `docker/README.md`, `docker-compose.yml` och `CHANGELOG.md` ska stämma med varandra. Dokumentationen ska ange Docker Hub-bilden att använda i compose, inte bygga från repot.
-- **Release:** höj versionen i `package.json` i PR:en enligt semver och lägg till `## X.Y.Z – ÅÅÅÅ-MM-DD` i `CHANGELOG.md`. När PR:en når `main` skapar `release.yml` tagg och release och anropar `docker.yml`, som publicerar `X.Y.Z`, `X.Y`, `X` och `latest` till Docker Hub. En merge utan versionshöjning släpper inget. Fallerar Docker-jobbet kan ägaren köra om det; Claude ändrar inte workflowen.
+- **Release:** höj versionen i `package.json` i PR:en enligt semver och lägg till `## X.Y.Z – ÅÅÅÅ-MM-DD` i `CHANGELOG.md`. När PR:en når `main` skapar `release.yml` tagg och release och anropar `docker.yml`, som publicerar `X.Y.Z`, `X.Y`, `X` och `latest` till Docker Hub. En merge utan versionshöjning släpper inget. Fallerar Docker-jobbet, kör om de fallerade jobben i release-körningen ("Re-run failed jobs"). Stannade releasen efter att taggen skapades, kör `docker.yml` manuellt (workflow_dispatch på taggen); annars publiceras ingen bild. Saknar sessionen behörighet, be ägaren göra det. Workflowfilerna ändras aldrig.
 
 ## Granskning i det här repot
 
@@ -96,6 +96,7 @@ GraphQL är avstängt, så `gh pr` och `gh issue` fungerar inte. Använd REST:
 - Svara i tråd: `gh api repos/pissmyran/dumpen/pulls/<n>/comments/<id>/replies -f body='…'`
 - Lös tråd: `gh api -X POST repos/pissmyran/dumpen/pulls/<n>/ccr/comments/<id>/resolve`
 - Kontroller: `gh api repos/pissmyran/dumpen/commits/<sha>/check-runs`
-- Auto-merge på: `gh api -X PUT repos/pissmyran/dumpen/pulls/<n>/ccr/auto_merge`
+- Auto-merge på: `gh api -X PUT repos/pissmyran/dumpen/pulls/<n>/ccr/auto_merge -f merge_method=squash`
+- Är PR:en redan klar att mergas (auto-merge vägras då), squash-merga direkt: `gh api -X PUT repos/pissmyran/dumpen/pulls/<n>/merge -f merge_method=squash`
 - Stäng PR: `gh api -X PATCH repos/pissmyran/dumpen/pulls/<n> -f state=closed`
-- Radera gren: `gh api -X DELETE repos/pissmyran/dumpen/git/refs/heads/<gren>`
+- Radera gren: GitHub raderar grenen vid merge. En stängd PR:s gren raderas med `git push origin --delete <gren>` (API-vägen är spärrad).
