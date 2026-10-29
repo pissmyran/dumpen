@@ -1,91 +1,91 @@
 # Dumpen
 
-**Dokumentation:** [pissmyran.github.io/dumpen](https://pissmyran.github.io/dumpen/) – start, dokumentation och Docker på en sida med sök.
+**Documentation:** [pissmyran.github.io/dumpen](https://pissmyran.github.io/dumpen/) – home, documentation and Docker on one searchable site.
 
-Dumpen är ett privat bildarkiv för appikoner och temabilder. Det körs som en Cloudflare Worker med bilderna i R2 och inloggning via Cloudflare Access. Det behöver ingen databas, KV eller kö.
+Dumpen is a private image archive for app icons and theme images. It runs as a Cloudflare Worker with the images in R2 and sign-in through Cloudflare Access. It needs no database, KV or queue.
 
-## Funktioner
+## Features
 
-- **Galleri** med översikt, appbilder, temabilder, rutnäts- och listvy, sökning, sortering och filter på app, tema och storlek.
-- **Uppladdning** av PNG-bilder i exakt 512 × 512 eller 1254 × 1254 pixlar, högst 12 MB. Storleken läses ur bildens egna bytes, inte ur filnamnet.
-- **ZIP-import** av många bilder på en gång, med en granskningslista före uppladdningen.
-- **Temabibliotek** där ett helt tema kan laddas ner som ZIP eller raderas.
-- **Fasta publika länkar** till varje bild, att klistra in i till exempel en apps logotypfält.
-- **Använd i App Launcher:** sätter ett temas ikoner på Cloudflare Access-apparna (valfritt, kräver ett API-token).
-- **Import från en äldre bucket:** bilder i en befintlig R2-bucket kan listas och kopieras in utan att originalen ändras.
-- Fungerar på mobil och med tangentbord. Inga externa bibliotek eller CDN; allt serveras av Workern.
+- **Gallery** with an overview, app images, theme images, grid and list views, search, sorting and filters for app, theme and size.
+- **Upload** of PNG images at exactly 512 × 512 or 1254 × 1254 pixels, at most 12 MB. The size is read from the image's own bytes, not from the file name.
+- **ZIP import** of many images at once, with a review list before uploading.
+- **Theme library** where a whole theme can be downloaded as a ZIP or deleted.
+- **Stable public links** to every image, to paste into for example an app's logo field.
+- **Use in App Launcher** (the *Använd i App Launcher* button; the interface is in Swedish): applies a theme's icons to the Cloudflare Access apps (optional, needs an API token).
+- **Import from an older bucket:** images in an existing R2 bucket can be listed and copied in without changing the originals.
+- Works on mobile and with a keyboard. No external libraries or CDN; the Worker serves everything.
 
-## Så fungerar det
+## How it works
 
-- **Inloggning:** allt utom `/bilder/*` kräver en giltig Cloudflare Access-JWT. Workern kontrollerar signaturen, utfärdaren, AUD och giltighetstiden själv, även för de statiska sidorna.
-- **Publika bilder:** `/bilder/*` är öppet för läsning (`GET` och `HEAD`) och kräver en egen Access-applikation för den sökvägen med policyn *Bypass → Everyone*. Har zonen *Hotlink Protection* påslaget behövs också en konfigurationsregel som stänger av den för `/bilder/`, annars visas bilderna inte på andra sidor.
-- **Lagring:** nya bilder sparas under `gallery/` i galleriets bucket:
+- **Sign-in:** everything except `/bilder/*` requires a valid Cloudflare Access JWT. The Worker checks the signature, issuer, AUD and expiry itself, also for the static pages.
+- **Public images:** `/bilder/*` is open for reading (`GET` and `HEAD`) and needs its own Access application for that path with the policy *Bypass → Everyone*. If the zone has *Hotlink Protection* turned on, a configuration rule that turns it off for `/bilder/` is also needed, or the images will not show on other sites.
+- **Storage:** new images are saved under `gallery/` in the gallery bucket:
 
   ```text
   gallery/apps/<app>/<app>-512x512-<id>.png
-  gallery/themes/<tema>/<app>/<tema>-<app>-1254x1254-<id>.png
+  gallery/themes/<theme>/<app>/<theme>-<app>-1254x1254-<id>.png
   ```
 
-  App, tema och storlek sparas också som metadata på varje bild, så listningen behöver aldrig läsa om bilderna.
-- **Äldre bucket:** bilder under `apps/` och `uploads/` i den äldre bucketen visas under `/bilder/apps/…` och `/bilder/uploads/…` och kan kopieras till `imported/` i galleriets bucket. Ingenting i den äldre bucketen skrivs över.
+  App, theme and size are also saved as metadata on each image, so the listing never needs to read the images again.
+- **Older bucket:** images under `apps/` and `uploads/` in the older bucket are shown under `/bilder/apps/…` and `/bilder/uploads/…` and can be copied to `imported/` in the gallery bucket. Nothing in the older bucket is overwritten.
 
-## ZIP-import
+## ZIP import
 
-Arkivet packas upp i webbläsaren med den medföljande `pako`-avkodaren. Varje PNG skickas sedan för sig genom `POST /api/upload`, så servern kontrollerar storlek, filtyp, upplösning och namn precis som vid en vanlig uppladdning.
+The archive is unpacked in the browser with the bundled `pako` decoder. Each PNG is then sent on its own through `POST /api/upload`, so the server checks size, file type, resolution and name exactly as for a normal upload.
 
-App och tema läses ur mapp- eller filnamnen:
+App and theme are read from the folder or file names:
 
-- `appar/<app>/<app>-512.png` → `gallery/apps/<app>/…`
-- `teman/<tema>/<app>/<app>-1254.png` → `gallery/themes/<tema>/<app>/…`
+- `apps/<app>/<app>-512.png` → `gallery/apps/<app>/…`
+- `themes/<theme>/<app>/<app>-1254.png` → `gallery/themes/<theme>/<app>/…`
 - `<app>-512.png` → `gallery/apps/<app>/…`
-- `<app>-<tema>-512.png` → `gallery/themes/<tema>/<app>/…`
+- `<app>-<theme>-512.png` → `gallery/themes/<theme>/<app>/…`
 
-Otydliga namn måste rättas i granskningslistan; ingen bild gissas in i fel app. Rader kan väljas bort, och misslyckade rader kan skickas igen utan att sparade bilder dubbleras.
+The folder names `appar` and `teman` work too. Ambiguous names must be fixed in the review list; no image is guessed into the wrong app. Rows can be deselected, and failed rows can be sent again without duplicating saved images.
 
-**Gränser:** högst 80 MB per ZIP, 100 bilder och 140 MB uppackad data, högst 12 MB per bild, bara 512 × 512 eller 1254 × 1254. Arkiv med osäkra sökvägar stoppas. Mappar, textfiler och macOS-systemfiler i arkivet hoppas över.
+**Limits:** at most 80 MB per ZIP, 100 images and 140 MB of unpacked data, at most 12 MB per image, only 512 × 512 or 1254 × 1254. Archives with unsafe paths are stopped. Folders, text files and macOS system files in the archive are skipped.
 
-## Lokal utveckling
+## Local development
 
 1. `npm install`
-2. Skapa en lokal `.dev.vars` med raden `LOCAL_DEV=true`. Den stänger av Access-kontrollen för `localhost` och får aldrig finnas i produktion.
+2. Create a local `.dev.vars` with the line `LOCAL_DEV=true`. It turns off the Access check for `localhost` and must never exist in production.
 3. `npm run dev`
 
-## Tester
+## Tests
 
 ```bash
 npm test && npm run check
 ```
 
-## Driftsätta på ett eget Cloudflare-konto
+## Deploying to your own Cloudflare account
 
-Koden innehåller inga kontouppgifter. Där ett eget värde behövs, som domän, resurs-id eller nycklar, står en platshållare (`__NAMN__`). Alla platshållare finns i `cloudflare.example.env`, med en kommentar om var värdet hämtas. Värdena hamnar bara i Cloudflare, aldrig i repot.
+The code contains no account details. Wherever a value of your own is needed, such as a domain, a resource id or keys, there is a placeholder (`__NAME__`). Every placeholder is listed in `cloudflare.example.env`, with a comment on where the value comes from. The values only end up in Cloudflare, never in the repo.
 
-**Alternativ 1: deploy från din egen dator.**
+**Option 1: deploy from your own computer.**
 
-1. Kopiera `cloudflare.example.env` till en egen fil utanför repot och fyll i dina värden.
-2. Rendera en kopia med dina värden: `node tools/render.mjs <din-fil.env> build [overlay-katalog]`. Verktyget stoppar om ett värde saknas. Filer i overlay-katalogen kopieras ovanpå, till exempel egna bilder.
-3. Lägg tokenet för App Launcher-funktionen som hemligheten `WORKERS_API_TOKEN` i Secrets Store (valfritt).
-4. Deploya: `npx wrangler deploy --cwd build`.
-5. Radera `build/`.
+1. Copy `cloudflare.example.env` to a file of your own outside the repo and fill in your values.
+2. Render a copy with your values: `node tools/render.mjs <your-file.env> build [overlay-dir]`. The tool stops if a value is missing. Files in the overlay directory are copied on top, for example your own images.
+3. Add the token for the App Launcher feature as the secret `WORKERS_API_TOKEN` in Secrets Store (optional).
+4. Deploy: `npx wrangler deploy --cwd build`.
+5. Delete `build/`.
 
-**Alternativ 2: Workers Builds med GitHub-koppling.** Lägg in värdena som *build variables* i Cloudflare (Workers → din Worker → Settings → Build), sätt byggkommandot till `node tools/render.mjs - build` och deploykommandot till `npx wrangler deploy --cwd build`. Bygg bara produktionsgrenen, så skapas inga förhandsversioner.
+**Option 2: Workers Builds with the GitHub connection.** Add the values as *build variables* in Cloudflare (Workers → your Worker → Settings → Build), set the build command to `node tools/render.mjs - build` and the deploy command to `npx wrangler deploy --cwd build`. Build only the production branch, so no preview versions are created.
 
-## Köra med Docker
+## Running with Docker
 
-Dumpen finns som färdig image på Docker Hub, `docker.io/driftaegis/dumpen`. Du behöver inte bygga något själv: i `docker-compose.yml` står imagen så här, och `docker compose up -d` hämtar den.
+Dumpen is available as a ready-made image on Docker Hub, `docker.io/driftaegis/dumpen`. You do not need to build anything: `docker-compose.yml` names the image like this, and `docker compose up -d` pulls it.
 
-I `docker-compose.yml`:
+In `docker-compose.yml`:
 
 ```yaml
     image: docker.io/driftaegis/dumpen:2
 ```
 
-Taggen `2` ger alla uppdateringar inom version 2; `X.Y` ger bara rättningar och `X.Y.Z` exakt en version. Alla inställningar beskrivs i [docker/README.md](docker/README.md), och ändringarna listas i [CHANGELOG.md](CHANGELOG.md). Vill du bygga imagen själv från källkoden: `docker build -t dumpen .` i repots rot.
+The tag `2` gives every update within version 2; `X.Y` gives only fixes and `X.Y.Z` exactly one version. Every setting is described in [docker/README.md](docker/README.md), and the changes are listed in [CHANGELOG.md](CHANGELOG.md). To build the image yourself from source: `docker build -t dumpen .` in the repo root.
 
-## Bidra
+## Contributing
 
-Frågor och idéer tas i [Discussions](https://github.com/pissmyran/.github/discussions), fel och förslag som issues här. Läs [CONTRIBUTING.md](https://github.com/pissmyran/.github/blob/main/CONTRIBUTING.md) innan du öppnar en pull request. Säkerhetsproblem rapporteras privat via fliken Security.
+Questions and ideas go to [Discussions](https://github.com/pissmyran/.github/discussions), bugs and suggestions as issues here. Read [CONTRIBUTING.md](https://github.com/pissmyran/.github/blob/main/CONTRIBUTING.md) before opening a pull request. Report security problems privately through the Security tab.
 
-## Licens
+## License
 
-MIT, se [LICENSE](LICENSE). Den medföljande `pako` har MIT-licens, se [PAKO-LICENSE.txt](PAKO-LICENSE.txt).
+MIT, see [LICENSE](LICENSE). The bundled `pako` is MIT licensed, see [PAKO-LICENSE.txt](PAKO-LICENSE.txt).

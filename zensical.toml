@@ -5,19 +5,19 @@
 # docs/; edit those, never site-docs/ or site/.
 [project]
 site_name = "Dumpen"
-site_description = "Bildarkiv för appikoner och teman på Cloudflare R2, med ZIP-import och temabibliotek."
+site_description = "Image archive for app icons and themes on Cloudflare R2, with ZIP import and a theme library."
 repo_url = "https://github.com/pissmyran/dumpen"
 repo_name = "pissmyran/dumpen"
 docs_dir = "site-docs"
 site_dir = "site"
 nav = [
-  { "Start" = "index.md" },
+  { "Home" = "index.md" },
   { "Docker" = "docker.md" },
-  { "Källkod på GitHub" = "https://github.com/pissmyran/dumpen#readme" },
+  { "Source on GitHub" = "https://github.com/pissmyran/dumpen#readme" },
 ]
 
 [project.theme]
-language = "sv"
+language = "en"
 font = false
 features = [
   "content.code.copy",
@@ -40,7 +40,7 @@ repo = "fontawesome/brands/github"
 [[project.theme.palette]]
 media = "(prefers-color-scheme)"
 toggle.icon = "lucide/sun-moon"
-toggle.name = "Byt till ljust läge"
+toggle.name = "Switch to light mode"
 
 [[project.theme.palette]]
 media = "(prefers-color-scheme: light)"
@@ -48,7 +48,7 @@ scheme = "default"
 primary = "deep-orange"
 accent = "deep-orange"
 toggle.icon = "lucide/sun"
-toggle.name = "Byt till mörkt läge"
+toggle.name = "Switch to dark mode"
 
 [[project.theme.palette]]
 media = "(prefers-color-scheme: dark)"
@@ -56,12 +56,12 @@ scheme = "slate"
 primary = "deep-orange"
 accent = "deep-orange"
 toggle.icon = "lucide/moon"
-toggle.name = "Följ systemets inställning"
+toggle.name = "Follow the system setting"
 
 [[project.extra.social]]
 icon = "fontawesome/brands/github"
 link = "https://github.com/pissmyran/dumpen#readme"
-name = "Källkoden på GitHub"
+name = "Source on GitHub"
 
 [project.markdown_extensions]
 abbr = {}

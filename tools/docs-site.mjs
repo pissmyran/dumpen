@@ -11,7 +11,7 @@
 // to anything else in the repo point to the file on GitHub, so every link works
 // on the site and in the wiki. The repo address is repo_url in zensical.toml,
 // and the page titles and their order come from nav there. The README line that
-// links to the site itself ("**Dokumentation:** ...") is left out.
+// links to the site itself ("**Documentation:** ...") is left out.
 //
 // The wiki is a one-way mirror: its pages are flat (Home, Docker and one page
 // per nav title), with _Sidebar.md for the menu and _Footer.md saying where to
@@ -102,7 +102,7 @@ const rewrite = (src, dst, text) => {
   let fenced = false;
   return text
     .split("\n")
-    .filter((line) => !(src === "README.md" && line.startsWith("**Dokumentation:**")))
+    .filter((line) => !(src === "README.md" && line.startsWith("**Documentation:**")))
     .map((line) => {
       if (/^\s*(```|~~~)/.test(line)) fenced = !fenced;
       if (fenced) return line;
@@ -128,14 +128,14 @@ for (const [src, dst] of pages) {
 if (wiki) {
   const menu = [...titles.keys()]
     .filter((page) => [...pages.values()].includes(page))
-    .map((page) => `- [${page === "index.md" ? "Start" : titles.get(page)}](${wikiName(page)})`);
+    .map((page) => `- [${page === "index.md" ? "Home" : titles.get(page)}](${wikiName(page)})`);
   writeFileSync(
     posix.join(out, "_Sidebar.md"),
-    [...menu, `- [Källkod på GitHub](${repoUrl}#readme)`, ""].join("\n"),
+    [...menu, `- [Source on GitHub](${repoUrl}#readme)`, ""].join("\n"),
   );
   writeFileSync(
     posix.join(out, "_Footer.md"),
-    `Wikin speglas automatiskt från [repot](${repoUrl}) (\`README.md\`, \`docker/README.md\` och \`docs/\`) vid varje merge till \`main\`. Ändra där; ändringar här skrivs över.\n`,
+    `This wiki is mirrored automatically from [the repo](${repoUrl}) (\`README.md\`, \`docker/README.md\` and \`docs/\`) on every merge to \`main\`. Edit there; changes here are overwritten.\n`,
   );
 }
 console.log(`${out}/: ${count} pages`);

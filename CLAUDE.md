@@ -1,10 +1,10 @@
 # CLAUDE.md – dumpen
 
-Vägledning för Claude Code i `pissmyran/dumpen`. Tjänsten dumpen: ett bildgalleri för appikoner och teman på Cloudflare R2, plus en Docker-bild för egen drift.
+Guidance for Claude Code in `pissmyran/dumpen`. The service dumpen: an image gallery for app icons and themes on Cloudflare R2, plus a Docker image for self-hosting.
 
-De gemensamma reglerna för alla repon finns i [STYRNING.md](https://github.com/pissmyran/.github/blob/main/STYRNING.md) i `pissmyran/.github`. Kärnreglerna nedan är en ordagrann kopia. Jämför versionen i markeringen med källan i början av varje session (`curl -sS https://raw.githubusercontent.com/pissmyran/.github/main/STYRNING.md`); är kopian äldre, uppdatera den först i en egen PR (`docs: sync core rules from .github`).
+The shared rules for all repos live in [STYRNING.md](https://github.com/pissmyran/.github/blob/main/STYRNING.md) in `pissmyran/.github`. The core rules below are a verbatim copy and stay in Swedish, because the copy is compared character by character with the source. Compare the version in the marker with the source at the start of every session (`curl -sS https://raw.githubusercontent.com/pissmyran/.github/main/STYRNING.md`); if the copy is older, update it first in a separate PR (`docs: sync core rules from .github`).
 
-## Kärnregler
+## Core rules
 
 <!-- kärnregler:start version=2026-10-28 källa=https://github.com/pissmyran/.github/blob/main/STYRNING.md -->
 1. **Inga personliga värden.** Repot är publikt. Skriv aldrig in riktiga id:n, domäner, e-postadresser, namn, nycklar, betallänkar eller kontouppgifter i kod, konfiguration, tester, dokumentation eller commit-meddelanden. Använd platshållare och `example.com`-värden.
@@ -24,79 +24,83 @@ De gemensamma reglerna för alla repon finns i [STYRNING.md](https://github.com/
 15. **GitHub bara via REST.** `gh pr` och `gh issue` fungerar inte i molnsessioner (GraphQL är avstängt). Använd `gh api` och de särskilda `ccr`-vägarna; se avsnittet GitHub från sessionen.
 <!-- kärnregler:slut -->
 
-## Om repot
+## About the repo
 
-Ett av fyra syskonrepon (`dumpen`, `jobb`, `klarsprak`, `politiker`) med samma mönster för platshållare, deploy, Docker och dokumentation. Läs `AGENTS.md`, `README.md` och `docs/` före större ändringar.
+One of four sibling repos (`dumpen`, `jobb`, `klarsprak`, `politiker`) that share the same pattern for placeholders, deploy, Docker and documentation. Read `AGENTS.md`, `README.md` and `docs/` before larger changes.
 
-| Katalog | Ingång | Hanterare | Bindningar |
+| Directory | Entry | Handlers | Bindings |
 |---|---|---|---|
-| `.` | `src/index.js` (byggs av `build.mjs`) | fetch | R2 för galleriet och en äldre bucket, Secrets Store |
+| `.` | `src/index.js` (built by `build.mjs`) | fetch | R2 for the gallery and an older bucket, Secrets Store |
 
-## Kommandon
+## Commands
 
-Testa och syntaxkontrollera:
+Test and check syntax:
 
 ```bash
 npm test && npm run check
 ```
 
-Kör också, för det du har ändrat: `npx --yes prettier@latest --check .` (inställningar i `.prettierrc.json`, radbredd 100; rätta med `--write`), `shellcheck` på `.sh`-filer och `jq empty` på `.json`-filer. Tester som läser källfiler får inte bero på formatering; anropa hellre den riktiga koden.
+Also run, for what you changed: `npx --yes prettier@latest --check .` (settings in `.prettierrc.json`, line width 100; fix with `--write`), `shellcheck` on `.sh` files and `jq empty` on `.json` files. Tests that read source files must not depend on formatting; call the real code instead.
 
-## Arkitektur
+## Rules for this repo
 
-- **Bygget:** `src/index.js` är skriven för Workers Static Assets. Det som driftsätts är `dist/worker.js`, som `build.mjs` bygger med `public/` inbäddat. Ändra källan, aldrig `dist/`.
-- **Åtkomst:** bara `/bilder/*` är publikt. Allt annat kräver Access-JWT, eller en lösenordssession med `AUTH_MODE=password` vid egen drift. Sätt aldrig `AUTH_MODE` eller `LOCAL_DEV` i produktion.
-- **R2 skannas inkrementellt:** metadata sparas vid skrivning, edge-cachen används, och en range-läsning sker bara en gång per objektversion. Ingen full omskanning per förfrågan.
+- **Language:** everything in this repo is English, including the documentation, PR titles and bodies, commit messages, review replies and labels. Only the core rules block above stays in Swedish. The app's interface and older code comments are still Swedish; write every new or changed comment in English, and change the interface language only as its own task.
 
-## Platshållare och deploy
+## Architecture
 
-- **Koden är generisk** och innehåller bara platshållare `__NAMN__`. Varje platshållare som används ska deklareras i `cloudflare.example.env` med ett exempelvärde och en kommentar om var det riktiga värdet kommer ifrån.
-- **`node tools/render.mjs <values.env | -> <utkatalog> [overlay]`** kopierar repot, fyller i alla deklarerade platshållare (och stoppar om ett värde saknas), lägger overlay-katalogen ovanpå, tar bort routes med tomt mönster och länkar `node_modules`. Med `-` kommer värdena från miljövariabler.
-- **Produktion** driftsätts av Workers Builds (Cloudflares GitHub-koppling) när en PR mergas till `main`, med värdena som byggvariabler i Cloudflare: bygg med `node tools/render.mjs - build`, driftsätt med `npx wrangler deploy --cwd build`. Bara `main` byggs.
-- **Egen driftsättning** från en privat värdefil fungerar likadant: rendera, kör `npx wrangler deploy --cwd build` och släng den renderade kopian. Hemligheter läggs in med `npx wrangler secret put`.
-- **Migreringar:** driftsätt den nya Workern innan en migrering som tar bort tabeller eller kolumner körs.
-- **Tester** körs på den orenderade källan och ser alltså platshållarna.
+- **The build:** `src/index.js` is written for Workers Static Assets. What gets deployed is `dist/worker.js`, which `build.mjs` builds with `public/` embedded. Change the source, never `dist/`.
+- **Access:** only `/bilder/*` is public. Everything else requires an Access JWT, or a password session with `AUTH_MODE=password` when self-hosting. Never set `AUTH_MODE` or `LOCAL_DEV` in production.
+- **R2 is scanned incrementally:** metadata is saved on write, the edge cache is used, and a range read happens only once per object version. No full rescan per request.
 
-## Kostnad och loggning
+## Placeholders and deploy
 
-- **Gratisplanen:** sikta på Workers Free, 10 ms CPU per anrop. Ingen full inventering eller omskanning per cron-körning, förfrågan eller tillagt objekt; arbeta inkrementellt och spara härledda data när de skrivs.
-- **Loggning:** loggar med sampling 1 och anropsloggar, traces 0,01, frågesträngar maskerade och Workers Issues på. Logga fel och varningar och högst en eller två rader per körning. Hanterade fel når Issues bara genom `console.error`.
+- **The code is generic** and only contains `__NAME__` placeholders. Every placeholder in use must be declared in `cloudflare.example.env` with a sample value and a comment on where the real value comes from.
+- **`node tools/render.mjs <values.env | -> <outdir> [overlay]`** copies the repo, fills in every declared placeholder (and stops if a value is missing), lays the overlay directory on top, removes routes with an empty pattern and links `node_modules`. With `-` the values come from environment variables.
+- **Production** is deployed by Workers Builds (Cloudflare's GitHub connection) when a PR is merged to `main`, with the values as build variables in Cloudflare: build with `node tools/render.mjs - build`, deploy with `npx wrangler deploy --cwd build`. Only `main` is built.
+- **Self-deploying** from a private value file works the same way: render, run `npx wrangler deploy --cwd build` and throw away the rendered copy. Secrets are added with `npx wrangler secret put`.
+- **Migrations:** deploy the new Worker before running a migration that drops tables or columns.
+- **Tests** run on the unrendered source and therefore see the placeholders.
 
-## Dokumentation
+## Cost and logging
 
-`README.md`, `docker/README.md` och `docs/` är också dokumentationssajten på GitHub Pages (`pissmyran.github.io/dumpen`), byggd med Zensical (`zensical.toml`, `requirements-docs.txt`) och publicerad från `main` av `.github/workflows/pages.yml`. Appen ligger bakom Cloudflare Access, så dokumentationen publiceras bara på GitHub.
+- **The free plan:** aim for Workers Free, 10 ms CPU per request. No full inventory or rescan per cron run, request or added object; work incrementally and save derived data when it is written.
+- **Logging:** logs with sampling 1 and invocation logs, traces 0.01, query strings masked and Workers Issues on. Log errors and warnings and at most one or two lines per run. Handled errors only reach Issues through `console.error`.
 
-- **Bygg lokalt:** installera Zensical med `pip install -r requirements-docs.txt` (gärna i en virtuell miljö), kör sedan `node tools/docs-site.mjs && zensical build` (utdata i `site/`). `tools/docs-site.mjs` gör README till startsida och pekar länkar till filer utanför sajten mot GitHub.
-- **Wikin** speglas envägs av `.github/workflows/wiki.yml`. Redigera aldrig wikin.
-- **README** ska behålla raden `**Dokumentation:**` överst. Nya sidor under `docs/` läggs in i `nav` i `zensical.toml`; titlarna där blir också wikins sidnamn.
+## Documentation
 
-## Docker och release
+`README.md`, `docker/README.md` and `docs/` are also the documentation site on GitHub Pages (`pissmyran.github.io/dumpen`), built with Zensical (`zensical.toml`, `requirements-docs.txt`) and published from `main` by `.github/workflows/pages.yml`. The app sits behind Cloudflare Access, so the documentation is only published on GitHub.
 
-- **Filer:** `Dockerfile` (bygg från roten: `docker build -t dumpen .`), `docker-compose.yml`, `CHANGELOG.md` och `docker/` (`README.md` är sidan på Docker Hub, `entrypoint.sh`, `import-settings.sh` och containerns wrangler-konfiguration).
-- **Körning:** Workern körs i workerd via `wrangler dev --local` med allt tillstånd under `/data`. Entrypointen renderar källan med `tools/render.mjs` från containerns miljö med standardvärden som fungerar direkt, och genererar saknade krypteringsnycklar en gång till `/data`. Befintliga nycklar skrivs aldrig över. Bilderna startar tomma och läser aldrig från någons Cloudflare-resurser.
-- **Inställningar** kommer från `docker-compose.yml`, eller en gång från `/data/import.env`, som `import-settings.sh` slår ihop med `/data/settings.env` och sedan raderar. Icke-tomma compose-variabler vinner.
-- **Håll ihop:** `docker/README.md`, `docker-compose.yml` och `CHANGELOG.md` ska stämma med varandra. Dokumentationen ska ange Docker Hub-bilden att använda i compose, inte bygga från repot.
-- **Release:** höj versionen i `package.json` i PR:en enligt semver och lägg till `## X.Y.Z – ÅÅÅÅ-MM-DD` i `CHANGELOG.md`. När PR:en når `main` skapar `release.yml` tagg och release och anropar `docker.yml`, som publicerar `X.Y.Z`, `X.Y`, `X` och `latest` till Docker Hub. En merge utan versionshöjning släpper inget. Fallerar Docker-jobbet, kör om de fallerade jobben i release-körningen ("Re-run failed jobs"). Stannade releasen efter att taggen skapades, kör `docker.yml` manuellt (workflow_dispatch på taggen); annars publiceras ingen bild. Saknar sessionen behörighet, be ägaren göra det. Workflowfilerna ändras aldrig.
+- **Build locally:** install Zensical with `pip install -r requirements-docs.txt` (preferably in a virtual environment), then run `node tools/docs-site.mjs && zensical build` (output in `site/`). `tools/docs-site.mjs` makes the README the home page and points links to files outside the site at GitHub.
+- **The wiki** is mirrored one way by `.github/workflows/wiki.yml`. Never edit the wiki.
+- **The README** must keep the `**Documentation:**` line at the top. New pages under `docs/` go into `nav` in `zensical.toml`; their titles also become the wiki page names.
 
-## Granskning i det här repot
+## Docker and release
 
-- **Grind:** `main` kräver PR, linjär historik, lösta granskningstrådar och CodeQL utan fel eller allvarliga larm. Inga andra kontroller krävs, men de som körs ska vara gröna. De lokala testerna i Kommandon är testgrinden.
-- **CodeRabbit:** ärver den centrala konfigurationen i `pissmyran/coderabbit`. Repots `.coderabbit.yaml` pekar ut riskområden med egna granskningsinstruktioner; läs den del som gäller filerna du ändrar innan du börjar.
-- **Sourcery och Codex:** granskar också, som GitHub-appar utan egen konfiguration här, och de granskar även dokumentation. Behandla deras trådar som CodeRabbits.
-- **Extra noggrant:** åtkomstkontroll, R2-skanning och zip-import.
+- **Files:** `Dockerfile` (build from the root: `docker build -t dumpen .`), `docker-compose.yml`, `CHANGELOG.md` and `docker/` (`README.md` is the Docker Hub page, plus `entrypoint.sh`, `import-settings.sh` and the container's wrangler configuration).
+- **Runtime:** the Worker runs in workerd through `wrangler dev --local` with all state under `/data`. The entrypoint renders the source with `tools/render.mjs` from the container's environment, with defaults that work out of the box, and generates missing encryption keys once into `/data`. Existing keys are never overwritten. The images start empty and never read from anyone's Cloudflare resources.
+- **Settings** come from `docker-compose.yml`, or once from `/data/import.env`, which `import-settings.sh` merges into `/data/settings.env` and then deletes. Non-empty compose variables win.
+- **Keep in sync:** `docker/README.md`, `docker-compose.yml` and `CHANGELOG.md` must agree with each other. The documentation names the Docker Hub image to use in compose instead of building from the repo.
+- **Release:** bump the version in `package.json` in the PR following semver and add `## X.Y.Z – YYYY-MM-DD` to `CHANGELOG.md`. When the PR reaches `main`, `release.yml` creates the tag and release and calls `docker.yml`, which publishes `X.Y.Z`, `X.Y`, `X` and `latest` to Docker Hub. A merge without a version bump releases nothing. If the Docker job fails, re-run the failed jobs in the release run ("Re-run failed jobs"). If the release stopped after the tag was created, run `docker.yml` manually (workflow_dispatch on the tag); otherwise no image is published. If the session lacks permission, ask the owner. The workflow files are never changed.
 
-## GitHub från sessionen
+## Review in this repo
 
-GraphQL är avstängt, så `gh pr` och `gh issue` fungerar inte. Använd REST:
+- **Gate:** `main` requires a PR, linear history, resolved review threads and CodeQL without errors or serious alerts. No other checks are required, but the ones that run must be green. The local tests under Commands are the test gate.
+- **CodeRabbit:** inherits the central configuration in `pissmyran/coderabbit`. The repo's `.coderabbit.yaml` points out risk areas with their own review instructions; read the part for the files you change before you start.
+- **Sourcery and Codex:** also review, as GitHub apps without their own configuration here, and they review documentation too. Treat their threads like CodeRabbit's.
+- **Extra care:** access control, R2 scanning and ZIP import.
 
-- Öppna PR: `gh api repos/pissmyran/dumpen/pulls -f base=main -f head=<gren> -f title='…' -f body='…'`
-- PR från gren: `gh api 'repos/pissmyran/dumpen/pulls?head=pissmyran:<gren>&state=open'`
-- Issue: `gh api repos/pissmyran/dumpen/issues/<n>` och `…/issues/<n>/comments`
-- Granskningstrådar: `gh api repos/pissmyran/dumpen/pulls/<n>/ccr/review_threads`
-- Svara i tråd: `gh api repos/pissmyran/dumpen/pulls/<n>/comments/<id>/replies -f body='…'`
-- Lös tråd: `gh api -X POST repos/pissmyran/dumpen/pulls/<n>/ccr/comments/<id>/resolve`
-- Kontroller: `gh api repos/pissmyran/dumpen/commits/<sha>/check-runs`
-- Auto-merge på: `gh api -X PUT repos/pissmyran/dumpen/pulls/<n>/ccr/auto_merge -f merge_method=squash`
-- Är PR:en redan klar att mergas (auto-merge vägras då), squash-merga direkt: `gh api -X PUT repos/pissmyran/dumpen/pulls/<n>/merge -f merge_method=squash`
-- Stäng PR: `gh api -X PATCH repos/pissmyran/dumpen/pulls/<n> -f state=closed`
-- Radera gren: GitHub raderar grenen vid merge. En stängd PR:s gren raderas med `git push origin --delete <gren>` (API-vägen är spärrad).
+## GitHub from a session
+
+GraphQL is disabled, so `gh pr` and `gh issue` do not work. Use REST:
+
+- Open a PR: `gh api repos/pissmyran/dumpen/pulls -f base=main -f head=<branch> -f title='…' -f body='…'`
+- PR from a branch: `gh api 'repos/pissmyran/dumpen/pulls?head=pissmyran:<branch>&state=open'`
+- Issue: `gh api repos/pissmyran/dumpen/issues/<n>` and `…/issues/<n>/comments`
+- Review threads: `gh api repos/pissmyran/dumpen/pulls/<n>/ccr/review_threads`
+- Reply in a thread: `gh api repos/pissmyran/dumpen/pulls/<n>/comments/<id>/replies -f body='…'`
+- Resolve a thread: `gh api -X POST repos/pissmyran/dumpen/pulls/<n>/ccr/comments/<id>/resolve`
+- Checks: `gh api repos/pissmyran/dumpen/commits/<sha>/check-runs`
+- Enable auto-merge: `gh api -X PUT repos/pissmyran/dumpen/pulls/<n>/ccr/auto_merge -f merge_method=squash`
+- If the PR is already mergeable (auto-merge is then refused), squash-merge directly: `gh api -X PUT repos/pissmyran/dumpen/pulls/<n>/merge -f merge_method=squash`
+- Close a PR: `gh api -X PATCH repos/pissmyran/dumpen/pulls/<n> -f state=closed`
+- Delete a branch: GitHub deletes the branch on merge. A closed PR's branch is deleted with `git push origin --delete <branch>` (the API route is blocked).

@@ -1,10 +1,11 @@
 # AGENTS.md
 
-- Gemensamma regler för arbetssätt, deploy, loggning, kostnader och Docker finns i [CLAUDE.md](CLAUDE.md). Arbetet sker på en egen gren per session; `main` ändras bara genom en PR från den grenen med squash merge.
-- Läs [README.md](README.md) före större ändringar.
-- `src/index.js` är skriven för Workers Static Assets. Det som deployas är `dist/worker.js`, som `build.mjs` bygger med `public/` inbäddat och produktionens variabler injicerade. Ändra källan, inte `dist/`.
-- Bara `/bilder/*` är publikt. Allt annat kräver inloggning: Cloudflare Access-JWT i produktion, eller `AUTH_MODE=password` i en egen installation. Sätt aldrig `AUTH_MODE` eller `LOCAL_DEV` i produktion.
-- Skanna R2 inkrementellt: dimensioner kommer från `customMetadata` eller edge-cachen, och en range-läsning sker bara en gång per objektversion. Ingen fullständig omskanning per förfrågan.
-- Kör `npm test` före push.
-- Koden innehåller inga personliga värden, bara platshållare (`__NAMN__`) som deklareras i `cloudflare.example.env` och fylls i av `tools/render.mjs` vid deploy och av `docker/entrypoint.sh` i containern. Se regeln i `CLAUDE.md`. Uppdatera `CHANGELOG.md` och versionen i `package.json` vid varje ny image.
-- Lägg aldrig API-tokens eller andra secrets i repository eller publik dokumentation.
+- The shared rules for workflow, deploy, logging, cost and Docker are in [CLAUDE.md](CLAUDE.md). Each session works on its own branch; `main` only changes through a PR from that branch with a squash merge.
+- Read [README.md](README.md) before larger changes.
+- `src/index.js` is written for Workers Static Assets. What gets deployed is `dist/worker.js`, which `build.mjs` builds with `public/` embedded and the production variables injected. Change the source, not `dist/`.
+- Only `/bilder/*` is public. Everything else requires sign-in: a Cloudflare Access JWT in production, or `AUTH_MODE=password` in a self-hosted install. Never set `AUTH_MODE` or `LOCAL_DEV` in production.
+- Scan R2 incrementally: dimensions come from `customMetadata` or the edge cache, and a range read happens only once per object version. No full rescan per request.
+- Run `npm test` before pushing.
+- The code contains no personal values, only placeholders (`__NAME__`) declared in `cloudflare.example.env` and filled in by `tools/render.mjs` at deploy and by `docker/entrypoint.sh` in the container. See the rule in `CLAUDE.md`. Update `CHANGELOG.md` and the version in `package.json` for every new image.
+- Never put API tokens or other secrets in the repository or public documentation.
+- Everything is written in English.

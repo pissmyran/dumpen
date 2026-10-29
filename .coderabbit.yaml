@@ -6,118 +6,118 @@ reviews:
   path_instructions:
     - path: "{src/index.js,tests/worker.test.js}"
       instructions: |
-        Vid ändringar i routing eller autentisering, kontrollera att endast
-        bildläsning med GET och HEAD under /bilder/ är publik, utöver
-        lösenordslägets avsedda inloggnings- och utloggningsrutter.
-        API och statiska portalsidor ska kräva verifierad Access-JWT eller
-        en giltig lösenordssession i uttryckligt AUTH_MODE=password.
-        Kontrollera JWT-signatur, issuer, audience och giltighetstid.
-        Felaktig Access-konfiguration får inte öppna åtkomst.
-        LOCAL_DEV får bara kringgå kontrollen på localhost eller 127.0.0.1.
-        Kontrollera sessionssignatur, utgångstid och cookie-attribut.
-        Mutationer ska behålla sameOriginRequest där skyddet används.
+        When routing or authentication changes, check that only
+        image reads with GET and HEAD under /bilder/ are public, besides
+        the intended login and logout routes of password mode.
+        The API and static portal pages must require a verified Access JWT or
+        a valid password session with an explicit AUTH_MODE=password.
+        Check JWT signature, issuer, audience and expiry.
+        A broken Access configuration must never open access.
+        LOCAL_DEV may only bypass the check on localhost or 127.0.0.1.
+        Check session signature, expiry and cookie attributes.
+        Mutations must keep sameOriginRequest where that guard is used.
 
-        Vid ändringar i R2-operationer, kontrollera bucketval, tillåtna
-        nycklar och isoleringen mellan gallery/, imported/ och legacy.
-        Direktimport ska bevara originalet och inte skriva över en befintlig
-        destination. Kontrollera ETag vid ändrade källobjekt och samtidiga
-        försök; en kontroll före skrivning garanterar inte ensam detta.
-        Radering ska begränsas till avsett urval och behålla respektive
-        endpoints bekräftelsekrav. Kontrollera paginering och delvisa fel.
-        PNG-uppladdning ska validera faktiska bytes, storlek och upplösning.
-        Dimensionsskanning ska använda metadata eller cache före begränsad
-        range-läsning. Cacheidentiteten ska skilja källa, nyckel och ETag.
+        When R2 operations change, check the bucket choice, allowed
+        keys and the isolation between gallery/, imported/ and legacy.
+        Direct import must keep the original and never overwrite an existing
+        destination. Check the ETag for changed source objects and concurrent
+        attempts; a check before writing does not guarantee this on its own.
+        Deletion must be limited to the intended selection and keep each
+        endpoint's confirmation requirement. Check pagination and partial failures.
+        PNG uploads must validate the actual bytes, size and resolution.
+        Dimension scans must use metadata or cache before a bounded
+        range read. The cache identity must separate source, key and ETag.
 
-        Vid ändringar i App Launcher-integrationen, kontrollera att apply
-        jämför klientens förhandsgranskning med en ny serverberäknad plan.
-        Kontrollera appens aktuella logo_url före uppdatering.
-        themeRequest ska bevara berörda appinställningar och policylänkar.
-        Kontrollera verifieringen efter PUT och redovisningen av delvisa fel.
-        En timeout efter möjlig uppdatering får inte visas som verifierat
-        utebliven ändring. Kontrollera både strängtoken och Secrets Store.
-        Vid ändrade tester, kontrollera att R2-dubbel och fetch-stubbar kan
-        återge det aktuella felscenariot, inte bara lyckade operationer.
+        When the App Launcher integration changes, check that apply
+        compares the client's preview with a fresh server-computed plan.
+        Check the app's current logo_url before updating.
+        themeRequest must keep the affected app settings and policy links.
+        Check the verification after PUT and the reporting of partial failures.
+        A timeout after a possible update must never be shown as a verified
+        absence of change. Check both the string token and Secrets Store.
+        When tests change, check that the R2 double and fetch stubs can
+        reproduce the failure scenario at hand, not just successful operations.
 
     - path: "public/{zip-import,zip-ui}.js"
       instructions: |
-        Vid ändringar i ZIP-läsning, kontrollera gränser för arkivstorlek,
-        antal poster, bildstorlek och sammanlagd uppackad data.
-        Kontrollera även faktisk dekomprimerad storlek under uppackning,
-        inte bara storleksfält i ZIP-katalogen. Bevara ZIP-avkodarens
-        begränsade utbuffert i zip-ui.js.
-        Kontrollera säkra sökvägar, offsetgränser, lokala filhuvuden,
-        komprimeringsmetod, CRC och PNG-dimensioner.
-        Arkivsökvägar får inte bli godtyckliga R2-nycklar; varje bild ska gå
-        genom /api/upload och serverns validering.
-        Vid ändringar i uppladdningsloopen, kontrollera att sparade rader
-        inte skickas igen vid omförsök och att avbrott inte redovisas som
-        bekräftat utebliven lagring. Kontrollera tests/zip-import.test.js
-        för berörda parserfall och export/import av tema och variant.
+        When ZIP reading changes, check the limits for archive size,
+        entry count, image size and total uncompressed data.
+        Also check the actual decompressed size during extraction,
+        not only the size fields in the ZIP directory. Keep the ZIP decoder's
+        bounded output buffer in zip-ui.js.
+        Check safe paths, offset bounds, local file headers,
+        compression method, CRC and PNG dimensions.
+        Archive paths must never become arbitrary R2 keys; every image must go
+        through /api/upload and the server's validation.
+        When the upload loop changes, check that saved rows
+        are not sent again on retry and that an interruption is not reported as
+        a confirmed failure to store. Check tests/zip-import.test.js
+        for the affected parser cases and theme and variant export/import.
 
     - path: "public/{app,r2-ui,theme-ui,theme-library}.js"
       instructions: |
-        Vid ändringar i flytt eller katalogisering, kontrollera att den nya
-        bilden sparas innan originalet raderas. Legacy-original ska bevaras
-        vid import; radering av imported/-källan ska ske först efter lyckad
-        katalogisering. Kontrollera att delvisa fel inte visas som full framgång.
-        Vid ändringar i R2-vyn, kontrollera att sena svar från föregående
-        källa inte ersätter aktuellt urval och att mutationer använder rätt
-        source, key och ETag. Bevara skyddet mot dubbla pågående åtgärder.
-        Vid ändringar i temaradering, kontrollera att rätt temanamn bekräftas.
-        Vid ändringar i App Launcher-vyn, kontrollera att ändrat tema eller
-        upplösning ogiltigförklarar tidigare förhandsgranskning och att apply
-        skickar den visade ändringsplanen samt redovisar misslyckade appar.
-        Vid ändringar i ZIP-export, kontrollera att app, tema, variant och
-        upplösning bevaras vid återimport genom zip-import.js.
+        When moving or cataloging changes, check that the new
+        image is saved before the original is deleted. Legacy originals must be kept
+        on import; deleting the imported/ source must happen only after successful
+        cataloging. Check that partial failures are not shown as full success.
+        When the R2 view changes, check that late responses from a previous
+        source never replace the current selection and that mutations use the right
+        source, key and ETag. Keep the guard against duplicate running actions.
+        When theme deletion changes, check that the right theme name is confirmed.
+        When the App Launcher view changes, check that a changed theme or
+        resolution invalidates an earlier preview and that apply
+        sends the change plan that was shown and reports failed apps.
+        When ZIP export changes, check that app, theme, variant and
+        resolution survive re-import through zip-import.js.
 
     - path: "{build.mjs,public/manifest.json,wrangler.jsonc}"
       instructions: |
-        Vid ändringar i Worker-bygget eller statiska resurser, kontrollera
-        att public/manifest.json innehåller de resurser och modulimporter
-        som portalen behöver i det självständiga dist/worker.js.
-        Kontrollera att build.mjs fortfarande hittar exakt en fetch-ingång
-        och injicerar avsedda produktionsvärden utan att öppna autentiseringen.
-        Kontrollera samverkan mellan no_bundle, inbäddad ASSETS och Worker-entry.
-        Produktionskonfigurationen får inte införa LOCAL_DEV eller växla
-        till lösenordsläge av misstag. Kontrollera R2- och Secrets Store-bindningar
-        mot src/index.js och deklarerade platshållare i cloudflare.example.env.
+        When the Worker build or static assets change, check
+        that public/manifest.json contains the assets and module imports
+        the portal needs in the self-contained dist/worker.js.
+        Check that build.mjs still finds exactly one fetch entry
+        and injects the intended production values without opening authentication.
+        Check how no_bundle, the embedded ASSETS and the Worker entry work together.
+        The production configuration must never introduce LOCAL_DEV or switch
+        to password mode by mistake. Check the R2 and Secrets Store bindings
+        against src/index.js and the placeholders declared in cloudflare.example.env.
 
     - path: "{tools/render.mjs,cloudflare.example.env}"
       instructions: |
-        Vid ändringar i rendering eller platshållare, kontrollera att varje
-        använd platshållare deklareras i cloudflare.example.env och att
-        saknade värden stoppar renderingen. Skilj saknat och avsiktligt tomt värde.
-        Kontrollera att värden med citattecken eller radbrytningar inte förstör
-        JavaScript, JSON eller shellfiler där de infogas.
-        Kontrollera att borttagning av utdatakatalogen inte kan radera
-        källträdet eller värdefiler och att kopiering inte blir rekursiv.
-        Kontrollera länkar och overlay så att privata filer inte läses in
-        eller ändras av misstag. Hemliga värden får inte hamna i public/
-        eller i den inbäddade resursmanifesten.
+        When rendering or placeholders change, check that every
+        placeholder in use is declared in cloudflare.example.env and that
+        missing values stop the rendering. Separate a missing value from an intentionally empty one.
+        Check that values with quotes or line breaks never break
+        JavaScript, JSON or shell files where they are inserted.
+        Check that removing the output directory can never delete
+        the source tree or value files and that copying never becomes recursive.
+        Check links and the overlay so private files are never read
+        or changed by mistake. Secret values must never end up in public/
+        or in the embedded asset manifest.
 
     - path: "{Dockerfile,docker-compose.yml,docker/*.sh,docker/wrangler.jsonc,package.json}"
       instructions: |
-        Vid ändringar i containerstart eller uppgraderingar, kontrollera
-        Node, Wrangler och workerd tillsammans med entrypoint.sh.
-        Bevara körning som icke-root och nödvändig skrivåtkomst.
-        Wrangler ska använda lokal R2 med --persist-to /data; omstart eller
-        imagebyte får inte tömma bilder eller sparade inställningar.
-        Kontrollera båda AUTH_MODE-lägenas obligatoriska värden och att
-        lokal drift inte behöver ett Cloudflare-konto för bildlagring.
-        Vid ändringar i inställningsimport, kontrollera att NAME=value läses
-        som data, inte exekveras som shellkod. Bevara prioriteten för
-        icke-tomma miljövariabler och borttagning med ett tomt importvärde.
-        Kontrollera privata filbehörigheter och att importfilen inte tas bort
-        innan inställningarna har sparats. Hemligheter får inte byggas in i imagen.
-        Kontrollera att renderade källor och alla runtime-resurser finns med.
+        When container start or upgrades change, check
+        Node, Wrangler and workerd together with entrypoint.sh.
+        Keep running as non-root and the required write access.
+        Wrangler must use local R2 with --persist-to /data; a restart or
+        image change must never wipe images or saved settings.
+        Check the required values for both AUTH_MODE modes and that
+        local use does not need a Cloudflare account for image storage.
+        When settings import changes, check that NAME=value is read
+        as data, never executed as shell code. Keep the precedence of
+        non-empty environment variables and removal through an empty import value.
+        Check private file permissions and that the import file is not removed
+        before the settings are saved. Secrets must never be built into the image.
+        Check that rendered sources and all runtime assets are included.
 
     - path: ".github/workflows/{release,docker}.yml"
       instructions: |
-        Vid ändringar i releaseflödet, kontrollera kopplingen mellan
-        package.json-version, v-taggen, CHANGELOG.md och publicerad image.
-        En merge utan versionsändring ska inte skapa en ny release.
-        Kontrollera att docker.yml kan publicera både via tagg och
-        workflow_call från release.yml utan att förlora versionskontrollen.
-        Kontrollera att release-hemligheter bara används i publiceringssteget
-        och att omkörning efter delvis publicering inte märker fel image som
-        versions-, minor-, major- eller latest-tagg.
+        When the release flow changes, check the link between the
+        package.json version, the v tag, CHANGELOG.md and the published image.
+        A merge without a version change must not create a new release.
+        Check that docker.yml can publish both from a tag and
+        through workflow_call from release.yml without losing the version check.
+        Check that release secrets are only used in the publishing step
+        and that a rerun after a partial publish never tags the wrong image as
+        the version, minor, major or latest tag.

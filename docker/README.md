@@ -1,18 +1,18 @@
 # Dumpen
 
-Dumpen är ett privat bildarkiv för appikoner och temabilder. Du laddar upp PNG-bilder (512 × 512 eller 1254 × 1254), en och en eller många i taget som ZIP. Dumpen känner själv igen app, tema och upplösning och sorterar in bilderna. Varje bild får en fast publik länk, och hela teman kan laddas ner som ZIP.
+Dumpen is a private image archive for app icons and theme images. You upload PNG images (512 × 512 or 1254 × 1254), one at a time or many at once as a ZIP. Dumpen recognizes the app, theme and resolution by itself and files the images. Every image gets a stable public link, and whole themes can be downloaded as a ZIP.
 
-Alla bilder är publika via sin länk, `/bilder/...`. Allt annat, alltså galleriet, uppladdning och radering, kräver inloggning.
+Every image is public through its link, `/bilder/...`. Everything else, meaning the gallery, upload and delete, requires sign-in.
 
-## Kom igång
+## Getting started
 
-Imagen ligger på Docker Hub som `docker.io/driftaegis/dumpen`. Compose-filen nedan hämtar den därifrån, så du behöver varken klona repot eller bygga något.
+The image is on Docker Hub as `docker.io/driftaegis/dumpen`. The compose file below pulls it from there, so you neither clone the repo nor build anything.
 
-1. **Installera Docker.** På Windows och Mac: [Docker Desktop](https://www.docker.com/products/docker-desktop/). På Linux: paketet `docker.io` (Debian/Ubuntu) eller motsvarande. Podman fungerar också.
-2. **Skapa en mapp** och en fil i den som heter `docker-compose.yml`. Klistra in innehållet nedan.
-3. **Fyll i** `PUBLIC_URL` (adressen du öppnar Dumpen på) och ett eget `ADMIN_PASSWORD` på minst 8 tecken.
-4. **Starta** i den mappen: `docker compose up -d`
-5. **Öppna** adressen och logga in med lösenordet.
+1. **Install Docker.** On Windows and Mac: [Docker Desktop](https://www.docker.com/products/docker-desktop/). On Linux: the `docker.io` package (Debian/Ubuntu) or equivalent. Podman works too.
+2. **Create a folder** with a file in it named `docker-compose.yml`. Paste the content below.
+3. **Fill in** `PUBLIC_URL` (the address you open Dumpen at) and your own `ADMIN_PASSWORD` of at least 8 characters.
+4. **Start** it in that folder: `docker compose up -d`
+5. **Open** the address and sign in with the password.
 
 ```yaml
 services:
@@ -46,86 +46,86 @@ volumes:
   dumpen-data:
 ```
 
-## Inloggning: två sätt
+## Sign-in: two ways
 
-Välj med `AUTH_MODE`.
+Choose with `AUTH_MODE`.
 
-**`password`** (standard): en inloggningssida med lösenordet i `ADMIN_PASSWORD`. Sessionen gäller i 30 dagar. Om du byter lösenord loggas alla ut.
+**`password`** (default): a sign-in page with the password in `ADMIN_PASSWORD`. The session lasts 30 days. Changing the password signs everyone out.
 
-**`cloudflare-access`**: Cloudflare Access sköter inloggningen, med e-postkod, Google eller annan identitetsleverantör. Dumpen kontrollerar den signerade Access-token själv, så den som tar sig förbi Access släpps ändå inte in. Det kräver ett Cloudflare-konto med en domän:
-1. **Skapa en tunnel.** Gå till Zero Trust → Networks → Tunnels, skapa en tunnel och peka ett publikt värdnamn mot `http://dumpen:8787`. Kopiera tunnelns token till `TUNNEL_TOKEN`.
-2. **Skapa en Access-applikation.** Gå till Zero Trust → Access → Applications, lägg till en *self-hosted* applikation för samma värdnamn och skapa en policy för vilka som får logga in.
-3. **Fyll i compose-filen.** Kopiera applikationens *Application Audience (AUD) Tag* till `CF_ACCESS_AUD` och teamdomänen (`dittteam.cloudflareaccess.com`) till `CF_ACCESS_TEAM_DOMAIN`. Sätt `AUTH_MODE: "cloudflare-access"` och `PUBLIC_URL` till det publika värdnamnet.
-4. **Lägg till ett undantag för bilderna.** Skapa en Access-applikation för `<värdnamn>/bilder/*` med policyn *Bypass → Everyone*. Har zonen *Hotlink Protection* påslaget behövs också en konfigurationsregel som stänger av det för `/bilder/`, annars visas bilderna inte på andra sidor, som App Launcher.
-5. **Starta med tunneln:** `docker compose --profile tunnel up -d`
+**`cloudflare-access`**: Cloudflare Access handles sign-in, with an email code, Google or another identity provider. Dumpen checks the signed Access token itself, so anyone who gets past Access is still not let in. It needs a Cloudflare account with a domain:
+1. **Create a tunnel.** Go to Zero Trust → Networks → Tunnels, create a tunnel and point a public hostname at `http://dumpen:8787`. Copy the tunnel token to `TUNNEL_TOKEN`.
+2. **Create an Access application.** Go to Zero Trust → Access → Applications, add a *self-hosted* application for the same hostname and create a policy for who may sign in.
+3. **Fill in the compose file.** Copy the application's *Application Audience (AUD) Tag* to `CF_ACCESS_AUD` and the team domain (`yourteam.cloudflareaccess.com`) to `CF_ACCESS_TEAM_DOMAIN`. Set `AUTH_MODE: "cloudflare-access"` and `PUBLIC_URL` to the public hostname.
+4. **Add an exception for the images.** Create an Access application for `<hostname>/bilder/*` with the policy *Bypass → Everyone*. If the zone has *Hotlink Protection* turned on, a configuration rule that turns it off for `/bilder/` is also needed, or the images will not show on other sites such as App Launcher.
+5. **Start with the tunnel:** `docker compose --profile tunnel up -d`
 
-## Inställningar
+## Settings
 
-| Variabel | Krävs | Standard | Betydelse |
+| Variable | Required | Default | Meaning |
 |---|---|---|---|
-| `PUBLIC_URL` | Ja | `http://localhost:8787` | Adressen Dumpen nås på. Bildlänkarna byggs från den, så ange den publika adressen om bilderna ska användas utanför ditt nätverk. |
-| `AUTH_MODE` | Nej | `password` | `password` eller `cloudflare-access`. |
-| `ADMIN_PASSWORD` | Med `password` | – | Minst 8 tecken, gärna betydligt längre. |
-| `CF_ACCESS_TEAM_DOMAIN` | Med `cloudflare-access` | – | T.ex. `dittteam.cloudflareaccess.com`. |
-| `CF_ACCESS_AUD` | Med `cloudflare-access` | – | Access-applikationens AUD-tagg. |
-| `WORKERS_API_TOKEN` | Nej | – | Bara för funktionen "Använd i App Launcher", som sätter ett temas ikoner på dina Cloudflare Access-appar. Behörighet: *Access: Apps: Edit*. |
-| `CLOUDFLARE_ACCOUNT_ID` | Nej | – | Ditt Cloudflare-konto-id, för samma funktion. |
-| `TUNNEL_TOKEN` (tjänsten `tunnel`) | Nej | – | Token för Cloudflare Tunnel. |
-| `PORT` | Nej | `8787` | Porten inne i containern. |
+| `PUBLIC_URL` | Yes | `http://localhost:8787` | The address Dumpen is reached at. Image links are built from it, so give the public address if the images will be used outside your network. |
+| `AUTH_MODE` | No | `password` | `password` or `cloudflare-access`. |
+| `ADMIN_PASSWORD` | With `password` | – | At least 8 characters, preferably much longer. |
+| `CF_ACCESS_TEAM_DOMAIN` | With `cloudflare-access` | – | For example `yourteam.cloudflareaccess.com`. |
+| `CF_ACCESS_AUD` | With `cloudflare-access` | – | The Access application's AUD tag. |
+| `WORKERS_API_TOKEN` | No | – | Only for the "Use in App Launcher" feature (the *Använd i App Launcher* button), which applies a theme's icons to your Cloudflare Access apps. Permission: *Access: Apps: Edit*. |
+| `CLOUDFLARE_ACCOUNT_ID` | No | – | Your Cloudflare account id, for the same feature. |
+| `TUNNEL_TOKEN` (the `tunnel` service) | No | – | Token for Cloudflare Tunnel. |
+| `PORT` | No | `8787` | The port inside the container. |
 
-### Inställningar från en fil i stället
+### Settings from a file instead
 
-Vill du inte ha värden som lösenord i compose-filen lägger du dem som `NAMN=värde`-rader i filen `import.env` i datavolymen (den som monteras på `/data`) och startar om containern. Vid starten sparas värdena i `/data/settings.env`, som bara containern kan läsa, och `import.env` raderas. För att ändra ett värde senare lägger du en ny `import.env` med bara den raden. En rad med `NAMN=` och inget värde tar bort inställningen. Värden som är ifyllda i compose-filen gäller före sparade värden.
+If you do not want values such as passwords in the compose file, put them as `NAME=value` lines in the file `import.env` in the data volume (the one mounted at `/data`) and restart the container. At start the values are saved to `/data/settings.env`, which only the container can read, and `import.env` is deleted. To change a value later, add a new `import.env` with just that line. A line with `NAME=` and no value removes the setting. Values filled in in the compose file take precedence over saved values.
 
-## Data, säkerhetskopiering och uppdatering
+## Data, backup and updates
 
-- Bilderna ligger i volymen som är monterad på `/data`, som lokal R2-lagring under `/data/v3/r2/`. Metadata om app, tema och storlek följer med varje bild.
-- **Säkerhetskopiera:** `docker compose stop`, kopiera volymen och kör `docker compose start`. Du kan också ladda ner varje tema som ZIP i gränssnittet. Den ZIP-filen kan importeras igen precis som den är.
-- **Uppdatera:** `docker compose pull && docker compose up -d`.
-- **Versioner:** taggarna följer semver. `1` ger alla uppdateringar inom version 1, `1.2` bara rättningar och `1.2.0` exakt en version.
+- The images live in the volume mounted at `/data`, as local R2 storage under `/data/v3/r2/`. Metadata about app, theme and size follows each image.
+- **Back up:** `docker compose stop`, copy the volume and run `docker compose start`. You can also download each theme as a ZIP in the interface. That ZIP file can be imported again exactly as it is.
+- **Update:** `docker compose pull && docker compose up -d`.
+- **Versions:** the tags follow semver. `1` gives every update within version 1, `1.2` only fixes and `1.2.0` exactly one version.
 
 ## HTTPS
 
-Containern talar vanlig HTTP på port 8787. Med `cloudflare-access` sköter tunneln HTTPS. Med `password` och åtkomst utifrån behövs en omvänd proxy med certifikat, till exempel Caddy, Traefik eller nginx. Sessionscookien får flaggan `Secure` automatiskt när sidan nås via HTTPS.
+The container speaks plain HTTP on port 8787. With `cloudflare-access` the tunnel handles HTTPS. With `password` and access from outside, you need a reverse proxy with a certificate, for example Caddy, Traefik or nginx. The session cookie gets the `Secure` flag automatically when the page is reached over HTTPS.
 
-## Teknisk översikt
+## Technical overview
 
-- **Runtime:** Dumpen är skrivet som en Cloudflare Worker. I containern körs den i `workerd`, samma runtime som Cloudflare använder, via `wrangler dev --local` (Miniflare). De två R2-bucketarna (`gallery` och `legacy`) blir lokal lagring under `/data`. Bucketen `legacy` är tom och finns bara för att importfunktionen ska fungera.
-- **Lösenordsläget:** sessionen är en cookie (`HttpOnly`, `SameSite=Strict`) med utgångstid och en HMAC-SHA256-signatur, där `ADMIN_PASSWORD` är nyckeln. Lösenord och signatur jämförs i konstant tid, och fel lösenord ger en fördröjning. Ingen sessionsdata sparas på servern.
-- **Access-läget:** RS256-signaturen kontrolleras mot teamets publika nycklar, liksom utfärdare, AUD och giltighetstid.
-- **Ändringar:** alla ändrande anrop kräver same-origin. Svaren har strikt CSP och övriga säkerhetshuvuden. Bilder serveras bara med `GET` och `HEAD`, och bara för tillåtna sökvägar och filtyper.
-- **Imagen** bygger på `node:24-trixie-slim` (Node LTS på Debian stable), kör som användaren `node` och har en healthcheck. Den innehåller bara källkod med platshållare; dina värden fylls i när containern startar.
-- **Begränsningar:** `wrangler dev` är en utvecklingsserver som kör en process på en maskin. Det räcker för ett privat bildarkiv men ger inte Cloudflares skalning eller CDN. Bilderna cachas bara med vanliga `Cache-Control`-huvuden.
-- **Felsökning:** `docker compose logs -f`.
+- **Runtime:** Dumpen is written as a Cloudflare Worker. In the container it runs in `workerd`, the same runtime Cloudflare uses, through `wrangler dev --local` (Miniflare). The two R2 buckets (`gallery` and `legacy`) become local storage under `/data`. The `legacy` bucket is empty and only exists so the import feature works.
+- **Password mode:** the session is a cookie (`HttpOnly`, `SameSite=Strict`) with an expiry and an HMAC-SHA256 signature keyed with `ADMIN_PASSWORD`. Password and signature are compared in constant time, and a wrong password adds a delay. No session data is stored on the server.
+- **Access mode:** the RS256 signature is checked against the team's public keys, as are the issuer, AUD and expiry.
+- **Changes:** every changing request requires same-origin. Responses have a strict CSP and the other security headers. Images are only served with `GET` and `HEAD`, and only for allowed paths and file types.
+- **The image** is based on `node:24-trixie-slim` (Node LTS on Debian stable), runs as the `node` user and has a healthcheck. It only contains source code with placeholders; your values are filled in when the container starts.
+- **Limits:** `wrangler dev` is a development server that runs one process on one machine. That is enough for a private image archive but gives neither Cloudflare's scaling nor its CDN. Images are only cached with ordinary `Cache-Control` headers.
+- **Troubleshooting:** `docker compose logs -f`.
 
 ## Changelog
 
 **2.0.0**
-- Token för "Använd i App Launcher" heter nu `WORKERS_API_TOKEN`, samma namn som på Cloudflare. Byt namn på `CLOUDFLARE_API_TOKEN` i din compose-fil eller `import.env`; det gamla namnet läses inte längre. Byt också taggen till `:2` i compose-filen, eftersom `:1` stannar på version 1.
+- The token for "Use in App Launcher" is now called `WORKERS_API_TOKEN`, the same name as on Cloudflare. Rename `CLOUDFLARE_API_TOKEN` in your compose file or `import.env`; the old name is no longer read. Also change the tag to `:2` in the compose file, since `:1` stays on version 1.
 
 **1.3.3**
-- Imagen bygger på `node:24-trixie-slim`: Node 24 (LTS) på Debian 13 (stable).
+- The image is based on `node:24-trixie-slim`: Node 24 (LTS) on Debian 13 (stable).
 
 **1.3.2**
-- `tools/render.mjs` skriver varje ifylld fil i en loop tills alla byte är skrivna, så att en kort skrivning inte kan lämna en avkortad fil.
+- `tools/render.mjs` writes each filled-in file in a loop until every byte is written, so a short write cannot leave a truncated file.
 
 **1.3.1**
-- Bildadresser från API:t används bara om de är http(s), så ett lagrat värde kan aldrig bli skript i galleriet.
-- Synken av Access-appar skickar inte längre råa felvärden till webbläsaren.
-- `tools/render.mjs` läser och skriver varje fil genom samma filbeskrivare, så att filen inte kan bytas ut mellan kontroll och skrivning.
+- Image URLs from the API are only used if they are http(s), so a stored value can never become script in the gallery.
+- The Access app sync no longer sends raw error values to the browser.
+- `tools/render.mjs` reads and writes each file through the same file descriptor, so the file cannot be swapped between the check and the write.
 
 **1.3.0**
-- Inställningar kan ges en gång i `/data/import.env` i stället för i compose-filen. De sparas i `/data/settings.env` och importfilen raderas.
-- Imagen byggs från projektets eget repo: `docker build -t dumpen .`.
+- Settings can be given once in `/data/import.env` instead of in the compose file. They are saved to `/data/settings.env` and the import file is deleted.
+- The image is built from the project's own repo: `docker build -t dumpen .`.
 
 **1.2.0**
-- Första Docker-imagen, med R2 under `/data`.
-- Inloggning via `AUTH_MODE`: `password` eller `cloudflare-access`, med valfri Cloudflare Tunnel.
-- Funktionen "Använd i App Launcher" tar emot en vanlig API-token.
-- Att använda ett tema sparar ingen säkerhetskopia längre. Resultatet bekräftas och läses om från Cloudflare.
-- Vid ZIP-import får en temamapp som saknar namn, eller har ett allmänt namn, sitt namn från ZIP-filen.
-- Filtervy för bilder och temabibliotek med ZIP-nedladdning och radering. Bilder katalogiseras automatiskt vid import.
+- First Docker image, with R2 under `/data`.
+- Sign-in through `AUTH_MODE`: `password` or `cloudflare-access`, with an optional Cloudflare Tunnel.
+- The "Use in App Launcher" feature accepts a plain API token.
+- Applying a theme no longer saves a backup. The result is confirmed and re-read from Cloudflare.
+- On ZIP import, a theme folder without a name, or with a generic name, is named after the ZIP file.
+- Filter view for images and a theme library with ZIP download and delete. Images are catalogued automatically on import.
 
-## Licens
+## License
 
-MIT. Den medföljande komponenten `pako` har också MIT-licens.
+MIT. The bundled component `pako` is MIT licensed as well.
