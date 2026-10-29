@@ -44,7 +44,7 @@ Also run, for what you changed: `npx --yes prettier@latest --check .` (settings 
 
 ## Rules for this repo
 
-- **Language:** everything in this repo is English, including the documentation, PR titles and bodies, commit messages, review replies and labels. Only the core rules block above stays in Swedish. The app's interface and older code comments are still Swedish; translate comments when you touch the file, and change the interface language only as its own task.
+- **Language:** everything in this repo is English, including the documentation, PR titles and bodies, commit messages, review replies and labels. Only the core rules block above stays in Swedish. The app's interface and older code comments are still Swedish; write every new or changed comment in English, and change the interface language only as its own task.
 
 ## Architecture
 
