@@ -20,3 +20,4 @@ npm test && npm run check
 - **Language:** the app's interface is Swedish; change its language only as its own task. Comments are English.
 - **Documentation:** the app sits behind Access, so the documentation is published only on GitHub.
 - **Extra care:** access control, R2 scanning and ZIP import.
+- **Review:** `.coderabbit.yaml` inherits `pissmyran/coderabbit`, adds the Swedish-interface exception, and references shared guidelines and sibling service repositories. Cross-repository context requires eligible CodeRabbit access.

@@ -1,4 +1,6 @@
 # yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+# Inherit shared settings from pissmyran/coderabbit.
+# Keep only repository-specific settings here.
 
 inheritance: true
 
@@ -70,6 +72,15 @@ reviews:
         When ZIP export changes, check that app, theme, variant and
         resolution survive re-import through zip-import.js.
 
+    - path: "{src/index.js,public/**}"
+      instructions: |
+        AGENTS.md explicitly requires a Swedish application interface.
+        This is an exception to the inherited English-string rule:
+        preserve Swedish user-facing interface text unless the task explicitly
+        changes the interface language.
+        Keep code comments and developer documentation in English.
+        Do not report Swedish interface text as a language defect.
+
     - path: "{build.mjs,public/manifest.json,wrangler.jsonc}"
       instructions: |
         When the Worker build or static assets change, check
@@ -86,7 +97,8 @@ reviews:
       instructions: |
         When rendering or placeholders change, check that every
         placeholder in use is declared in cloudflare.example.env and that
-        missing values stop the rendering. Separate a missing value from an intentionally empty one.
+        missing values stop the rendering.
+        Separate a missing value from an intentionally empty one.
         Check that values with quotes or line breaks never break
         JavaScript, JSON or shell files where they are inserted.
         Check that removing the output directory can never delete
@@ -121,3 +133,33 @@ reviews:
         Check that release secrets are only used in the publishing step
         and that a rerun after a partial publish never tags the wrong image as
         the version, minor, major or latest tag.
+        These are review checks, not permission to edit owner-managed workflows.
+
+knowledge_base:
+  code_guidelines:
+    filePatterns:
+      - "**/AGENTS.md"
+      - "pissmyran/.github:GOVERNANCE.md"
+      - "pissmyran/.github:SERVICES.md"
+
+  linked_repositories:
+    - repository: pissmyran/jobb
+      instructions: |
+        Compare changes to the shared service tooling conventions:
+        placeholders, tools/render.mjs, Docker startup, settings import,
+        and documentation-site generation.
+        Report concrete compatibility differences, not unrelated application behavior.
+
+    - repository: pissmyran/klarsprak
+      instructions: |
+        Compare changes to the shared service tooling conventions:
+        placeholders, tools/render.mjs, Docker startup, settings import,
+        and documentation-site generation.
+        Report concrete compatibility differences, not unrelated application behavior.
+
+    - repository: pissmyran/politiker
+      instructions: |
+        Compare changes to the shared service tooling conventions:
+        placeholders, tools/render.mjs, Docker startup, settings import,
+        and documentation-site generation.
+        Report concrete compatibility differences, not unrelated application behavior.
