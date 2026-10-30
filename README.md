@@ -86,6 +86,13 @@ The tag `2` gives every update within version 2; `X.Y` gives only fixes and `X.Y
 
 Questions and ideas go to [Discussions](https://github.com/pissmyran/.github/discussions), bugs and suggestions as issues here. Read [CONTRIBUTING.md](https://github.com/pissmyran/.github/blob/main/CONTRIBUTING.md) before opening a pull request. Report security problems privately through the Security tab.
 
+CodeRabbit inherits shared review settings from `pissmyran/coderabbit`. The local
+[configuration](.coderabbit.yaml) preserves Swedish interface text as an exception to
+English guidance, references the shared governance documents, and links `jobb`,
+`klarsprak` and `politiker` for service-tooling compatibility reviews. Cross-repository
+context requires eligible CodeRabbit access; configuration does not grant access or
+control billing.
+
 ## License
 
 MIT, see [LICENSE](LICENSE). The bundled `pako` is MIT licensed, see [PAKO-LICENSE.txt](PAKO-LICENSE.txt).
